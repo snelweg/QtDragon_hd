@@ -263,6 +263,7 @@ class HandlerClass:
         self.w.gauge_spindle.set_max_reading(self.max_spindle_rpm / 1000)
         self.w.gauge_spindle.set_threshold(self.min_spindle_rpm)
         self.w.gauge_spindle.set_label("RPM")
+        self.w.gauge_spindle._value_font_size = 10
         
     def init_probe(self):
         probe = INFO.get_error_safe_setting('PROBE', 'USE_PROBE', 'none').lower()
@@ -599,6 +600,11 @@ class HandlerClass:
         elif dest == 'sensor':
             x = float(self.w.lineEdit_sensor_x.text())
             y = float(self.w.lineEdit_sensor_y.text())
+        elif dest == 'zero':
+            ACTION.CALL_MDI("G90")
+            ACTION.CALL_MDI_WAIT("G0 Z0")
+            ACTION.CALL_MDI_WAIT("G0 x0 Y0", 10)
+            return
         else:
             return
         if not STATUS.is_metric_mode():

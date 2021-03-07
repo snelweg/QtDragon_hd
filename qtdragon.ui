@@ -7481,7 +7481,7 @@ HEIGHT</string>
                   <number>4</number>
                  </property>
                  <item>
-                  <widget class="ActionButton" name="action_g30">
+                  <widget class="QPushButton" name="btn_goto_zero">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -7500,176 +7500,12 @@ HEIGHT</string>
                      <height>50</height>
                     </size>
                    </property>
-                   <property name="toolTip">
-                    <string>Use G30.1 to set G30 location</string>
-                   </property>
                    <property name="text">
                     <string>GO TO
-G30</string>
+ZERO</string>
                    </property>
-                   <property name="indicator_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="indicator_HAL_pin_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="indicator_status_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="checked_state_text_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="python_command_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="on_color" stdset="0">
-                    <color>
-                     <red>255</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </property>
-                   <property name="shape_option" stdset="0">
-                    <number>0</number>
-                   </property>
-                   <property name="off_color" stdset="0">
-                    <color>
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </property>
-                   <property name="indicator_size" stdset="0">
-                    <double>0.300000000000000</double>
-                   </property>
-                   <property name="circle_diameter" stdset="0">
-                    <double>10.000000000000000</double>
-                   </property>
-                   <property name="right_edge_offset" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                   <property name="top_edge_offset" stdset="0">
-                    <double>0.000000000000000</double>
-                   </property>
-                   <property name="corner_radius" stdset="0">
-                    <double>5.000000000000000</double>
-                   </property>
-                   <property name="height_fraction" stdset="0">
-                    <double>0.300000000000000</double>
-                   </property>
-                   <property name="width_fraction" stdset="0">
-                    <double>0.900000000000000</double>
-                   </property>
-                   <property name="true_state_string" stdset="0">
-                    <string>True</string>
-                   </property>
-                   <property name="false_state_string" stdset="0">
-                    <string>False</string>
-                   </property>
-                   <property name="true_python_cmd_string" stdset="0">
-                    <string>print&quot;true command&quot;</string>
-                   </property>
-                   <property name="false_python_cmd_string" stdset="0">
-                    <string>print&quot;false command&quot;</string>
-                   </property>
-                   <property name="invert_the_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_paused_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_estopped_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_on_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_idle_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_homed_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_flood_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_mist_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_block_delete_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_optional_stop_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_joint_homed_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_limits_overridden_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_manual_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_mdi_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_auto_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_spindle_stopped_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_spindle_fwd_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="is_spindle_rev_status" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="joint_number_status" stdset="0">
-                    <number>0</number>
-                   </property>
-                   <property name="mdi_command_action" stdset="0">
-                    <bool>true</bool>
-                   </property>
-                   <property name="template_label_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="joint_number" stdset="0">
-                    <number>0</number>
-                   </property>
-                   <property name="incr_imperial_number" stdset="0">
-                    <double>0.010000000000000</double>
-                   </property>
-                   <property name="incr_mm_number" stdset="0">
-                    <double>0.025000000000000</double>
-                   </property>
-                   <property name="incr_angular_number" stdset="0">
-                    <double>-1.000000000000000</double>
-                   </property>
-                   <property name="toggle_float_option" stdset="0">
-                    <bool>false</bool>
-                   </property>
-                   <property name="float_num" stdset="0">
-                    <double>0.300000000000000</double>
-                   </property>
-                   <property name="float_alt_num" stdset="0">
-                    <double>50.000000000000000</double>
-                   </property>
-                   <property name="view_type_string" stdset="0">
-                    <string>P</string>
-                   </property>
-                   <property name="command_text_string" stdset="0">
-                    <string>G30</string>
-                   </property>
-                   <property name="ini_mdi_number" stdset="0">
-                    <number>0</number>
-                   </property>
-                   <property name="textTemplate" stdset="0">
-                    <string>%1.3f in</string>
-                   </property>
-                   <property name="alt_textTemplate" stdset="0">
-                    <string>%1.2f mm</string>
+                   <property name="location" stdset="0">
+                    <string>zero</string>
                    </property>
                   </widget>
                  </item>
@@ -7702,6 +7538,77 @@ HOME</string>
                    </property>
                    <property name="location" stdset="0">
                     <string>home</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_42">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="btn_goto_sensor">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>50</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>80</width>
+                     <height>50</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Go to Tool Sensor location</string>
+                   </property>
+                   <property name="text">
+                    <string>GO TO
+SENSOR</string>
+                   </property>
+                   <property name="location" stdset="0">
+                    <string>sensor</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_tool_sensor">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>50</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>80</width>
+                     <height>50</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Tool touchoff to tool sensor</string>
+                   </property>
+                   <property name="text">
+                    <string>TOUCHOFF
+SENSOR</string>
+                   </property>
+                   <property name="sensor" stdset="0">
+                    <string>_toolsensor_</string>
                    </property>
                   </widget>
                  </item>
@@ -7812,42 +7719,10 @@ LASER</string>
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_42">
+                <layout class="QHBoxLayout" name="horizontalLayout_44">
                  <property name="spacing">
                   <number>4</number>
                  </property>
-                 <item>
-                  <widget class="QPushButton" name="btn_tool_sensor">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>80</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>Tool touchoff to tool sensor</string>
-                   </property>
-                   <property name="text">
-                    <string>TOOL
-SENSOR</string>
-                   </property>
-                   <property name="sensor" stdset="0">
-                    <string>_toolsensor_</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item>
                   <widget class="QPushButton" name="btn_touchplate">
                    <property name="sizePolicy">
@@ -7877,45 +7752,6 @@ PLATE</string>
                    </property>
                    <property name="sensor" stdset="0">
                     <string>_touchplate_</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_44">
-                 <property name="spacing">
-                  <number>4</number>
-                 </property>
-                 <item>
-                  <widget class="QPushButton" name="btn_goto_sensor">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>80</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>Go to Tool Sensor location</string>
-                   </property>
-                   <property name="text">
-                    <string>GO TO
-SENSOR</string>
-                   </property>
-                   <property name="location" stdset="0">
-                    <string>sensor</string>
                    </property>
                   </widget>
                  </item>
@@ -12942,7 +12778,7 @@ INCREMENT</string>
                <number>2</number>
               </property>
               <property name="text">
-               <string>03:14:25 PM</string>
+               <string>08:58:01 PM</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -13250,8 +13086,8 @@ INCREMENT</string>
    <slot>chk_override_limits_checked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
-     <y>86</y>
+     <x>764</x>
+     <y>88</y>
     </hint>
     <hint type="destinationlabel">
      <x>719</x>
@@ -13282,8 +13118,8 @@ INCREMENT</string>
    <slot>chk_use_virtual_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
-     <y>86</y>
+     <x>764</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
      <x>565</x>
@@ -13314,8 +13150,8 @@ INCREMENT</string>
    <slot>disable_spindle_pause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
-     <y>86</y>
+     <x>764</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>678</x>
@@ -13330,8 +13166,8 @@ INCREMENT</string>
    <slot>chk_use_sensor_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
-     <y>86</y>
+     <x>764</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>563</x>
@@ -13346,7 +13182,7 @@ INCREMENT</string>
    <slot>chk_use_camera_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
+     <x>764</x>
      <y>86</y>
     </hint>
     <hint type="destinationlabel">
@@ -13362,8 +13198,8 @@ INCREMENT</string>
    <slot>cam_dia_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>544</x>
-     <y>176</y>
+     <x>606</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>1703</x>
@@ -13378,8 +13214,8 @@ INCREMENT</string>
    <slot>cam_rot_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>544</x>
-     <y>176</y>
+     <x>606</x>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>1737</x>
@@ -13426,8 +13262,8 @@ INCREMENT</string>
    <slot>chk_run_from_line_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
-     <y>86</y>
+     <x>764</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
      <x>-17</x>
@@ -13570,8 +13406,8 @@ INCREMENT</string>
    <slot>chk_use_touchplate_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>614</x>
-     <y>86</y>
+     <x>764</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>635</x>
@@ -13634,8 +13470,8 @@ INCREMENT</string>
    <slot>btn_goto_location_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>452</x>
-     <y>866</y>
+     <x>508</x>
+     <y>792</y>
     </hint>
     <hint type="destinationlabel">
      <x>446</x>
@@ -13666,8 +13502,8 @@ INCREMENT</string>
    <slot>btn_touchoff_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>468</x>
-     <y>813</y>
+     <x>606</x>
+     <y>792</y>
     </hint>
     <hint type="destinationlabel">
      <x>959</x>
@@ -13682,8 +13518,8 @@ INCREMENT</string>
    <slot>btn_touchoff_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>566</x>
-     <y>813</y>
+     <x>508</x>
+     <y>885</y>
     </hint>
     <hint type="destinationlabel">
      <x>959</x>
@@ -13698,8 +13534,8 @@ INCREMENT</string>
    <slot>btn_ref_laser_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>566</x>
-     <y>767</y>
+     <x>606</x>
+     <y>838</y>
     </hint>
     <hint type="destinationlabel">
      <x>959</x>
@@ -13803,6 +13639,22 @@ INCREMENT</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btn_goto_zero</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>btn_goto_location_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>468</x>
+     <y>720</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>959</x>
+     <y>527</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <designerdata>
   <property name="gridDeltaX">
@@ -13877,7 +13729,7 @@ INCREMENT</string>
   <slot>chk_enable_spindle_changed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="mode_buttonGroup"/>
   <buttongroup name="page_buttonGroup"/>
+  <buttongroup name="mode_buttonGroup"/>
  </buttongroups>
 </ui>
