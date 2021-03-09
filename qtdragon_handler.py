@@ -602,7 +602,7 @@ class HandlerClass:
             y = float(self.w.lineEdit_sensor_y.text())
         elif dest == 'zero':
             ACTION.CALL_MDI("G90")
-            ACTION.CALL_MDI_WAIT("G0 Z0")
+            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
             ACTION.CALL_MDI_WAIT("G0 x0 Y0", 10)
             return
         else:
