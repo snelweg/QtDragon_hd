@@ -159,7 +159,6 @@ StatusLabel#status_rpm {
     font: 20pt "Lato Heavy";
 }
 
-/*StatusLabel#status_rpm[at_speed=false],*/
 StatusLabel#lbl_spindle_set[in_range=false] {
     color: red;
 }
@@ -169,7 +168,7 @@ DROLabel {
     border: 1px solid #C0C0C0;
     border-radius: 4px;
     font: 20pt "Lato Heavy";
-    color: #9ad58d;
+    color: #00FF00;
 }
 
 DROLabel[homed=false] {
