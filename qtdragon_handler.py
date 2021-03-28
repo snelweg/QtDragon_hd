@@ -28,7 +28,6 @@ TAB_FILE = 1
 TAB_OFFSETS = 2
 TAB_TOOL = 3
 TAB_STATUS = 4
-#TAB_PROBE = 5
 TAB_CAMVIEW = 5
 TAB_GCODES = 6
 TAB_SETUP = 7
@@ -149,7 +148,6 @@ class HandlerClass:
         hal_glib.GPin(pin).connect("value_changed", self.spindle_pwr_changed)
         pin = self.h.newpin("spindle_fault", hal.HAL_U32, hal.HAL_IN)
         hal_glib.GPin(pin).connect("value_changed", self.spindle_fault_changed)
-#        self.h.newpin("spindle_at_speed", hal.HAL_BIT, hal.HAL_IN)
         pin = self.h.newpin("modbus-errors", hal.HAL_U32, hal.HAL_IN)
         hal_glib.GPin(pin).connect("value_changed", self.mb_errors_changed)
         self.h.newpin("spindle_inhibit", hal.HAL_BIT, hal.HAL_OUT)
@@ -511,12 +509,13 @@ class HandlerClass:
 
     # main button bar
     def main_tab_changed(self, btn):
-        if STATUS.is_auto_mode():
-            self.add_status("Cannot switch pages while in AUTO mode")
-            self.w.btn_main.setChecked(True)
-            return
         index = btn.property("index")
         if index is None: return
+        if STATUS.is_auto_mode() and index != TAB_SETTINGS:
+            self.add_status("Cannot switch pages while in AUTO mode")
+            self.w.main_tab_widget.setCurrentIndex(TAB_MAIN)
+            self.w.btn_main.setChecked(True)
+            return
         if index == TAB_MAIN:
             self.w.stackedWidget_dro.setCurrentIndex(0)
         elif index == TAB_FILE and self.w.btn_gcode_edit.isChecked():

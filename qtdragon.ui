@@ -5115,7 +5115,7 @@ OFF</string>
                  <bool>false</bool>
                 </property>
                 <property name="flat">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="indicator_option" stdset="0">
                  <bool>false</bool>
@@ -5549,6 +5549,9 @@ OFF</string>
                     <width>24</width>
                     <height>24</height>
                    </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Spindle at programmed speed</string>
                   </property>
                   <property name="color">
                    <color>
@@ -9710,6 +9713,9 @@ ZERO</string>
                       </item>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_39">
+                        <property name="spacing">
+                         <number>4</number>
+                        </property>
                         <item>
                          <widget class="QPushButton" name="btn_maxv_ovr_50">
                           <property name="sizePolicy">
@@ -9914,6 +9920,9 @@ ZERO</string>
                       </item>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_36">
+                        <property name="spacing">
+                         <number>4</number>
+                        </property>
                         <item>
                          <widget class="ActionButton" name="action_rapid_ovr_50">
                           <property name="sizePolicy">
@@ -10136,6 +10145,9 @@ ZERO</string>
                       </item>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_21">
+                        <property name="spacing">
+                         <number>4</number>
+                        </property>
                         <item>
                          <widget class="ActionButton" name="action_feed_ovr_50">
                           <property name="sizePolicy">
@@ -10365,7 +10377,7 @@ ZERO</string>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_57">
                         <property name="spacing">
-                         <number>6</number>
+                         <number>4</number>
                         </property>
                         <property name="topMargin">
                          <number>0</number>
@@ -12778,7 +12790,7 @@ INCREMENT</string>
                <number>2</number>
               </property>
               <property name="text">
-               <string>08:58:01 PM</string>
+               <string>08:57:11 AM</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>

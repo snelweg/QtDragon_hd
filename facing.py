@@ -150,7 +150,10 @@ class Facing(QtWidgets.QWidget):
             return
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getSaveFileName(self,"Save to file","","All Files (*);;ngc Files (*.ngc)", options=options)
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setViewMode(QFileDialog.Detail)
+        fileName, _ = dialog.getSaveFileName(self,"Save to file","","All Files (*);;ngc Files (*.ngc)", options=options)
         if fileName:
             self.calculate_toolpath(fileName)
         else:
