@@ -1004,7 +1004,7 @@ class ProbeRoutines():
         if self.probe('yminus') == -1: return
         # show Y result
         a = STATUS.get_probed_position_with_offsets()
-        ymres =f loat(a[1]) - 0.5 * self.data_probe_diam
+        ymres = float(a[1]) - 0.5 * self.data_probe_diam
         self.status_ym = ymres
 
         # move Y +2 edge_length - 2 xy_clearance
