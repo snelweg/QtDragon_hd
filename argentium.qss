@@ -62,11 +62,11 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:unchecked {
-    image: url(images/unchecked.png);
+    image: url(qtdragon/images/unchecked.png);
 }
 
 QCheckBox::indicator:checked {
-    image: url(images/checked.png);
+    image: url(qtdragon/images/checked.png);
 }
 
 /** ComboBoxes **/

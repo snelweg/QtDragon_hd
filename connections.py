@@ -30,6 +30,7 @@ class Connections():
         self.w.btn_dimensions.clicked.connect(lambda state: self.parent.btn_dimensions_clicked(state))
         # action buttons
         # checkboxes
+        self.w.chk_use_mpg.stateChanged.connect(lambda state: self.parent.chk_use_mpg_changed(state))
         self.w.chk_override_limits.stateChanged.connect(lambda state: self.parent.chk_override_limits_changed(state))
         self.w.chk_use_tool_sensor.stateChanged.connect(lambda state: self.parent.chk_use_tool_sensor_changed(state))
         self.w.chk_use_touchplate.stateChanged.connect(lambda state: self.parent.chk_use_touchplate_changed(state))
@@ -46,8 +47,9 @@ class Connections():
         self.w.slider_maxv_ovr.valueChanged.connect(lambda value: self.parent.slider_maxv_changed(value))
         self.w.cam_diameter.valueChanged.connect(lambda value: self.parent.cam_dia_changed(value))
         self.w.cam_rotate.valueChanged.connect(lambda value: self.parent.cam_rot_changed(value))
+        # comboboxes
+        self.w.cmb_gcode_history.activated.connect(self.parent.cmb_gcode_history_clicked)
+        self.w.cmb_stylesheet.currentIndexChanged.connect(self.parent.apply_stylesheet_clicked)
         # misc
         self.w.gcode_viewer.percentDone.connect(lambda percent: self.parent.percent_done_changed(percent))
         self.w.gcodegraphics.percentLoaded.connect(lambda percent: self.parent.percent_loaded_changed(percent))
-        self.w.cmb_gcode_history.activated.connect(self.parent.cmb_gcode_history_clicked)
-        self.w.cmb_stylesheet.currentIndexChanged.connect(self.parent.apply_stylesheet_clicked)
