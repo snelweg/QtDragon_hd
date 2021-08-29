@@ -111,7 +111,7 @@ def set_motor_on(state):
     try:
         ser.write_register(0x1000, state, 0, 6)
         return True
-    except Exception, e:
+    except Exception as e:
         h['modbus-errors'] += 1
         print("Error writing register 0x1000: " + str(e))
         return False
@@ -126,7 +126,7 @@ def set_motor_speed():
         speed_cmd = (h['speed-cmd'] / max_speed) * 100
     try:
         ser.write_register(0x2000, speed_cmd, 2, 6)
-    except Exception, e:
+    except Exception as e:
         h['modbus-errors'] += 1
         print("Error writing register 0x2000: " + str(e))
     
@@ -135,7 +135,7 @@ def set_motor_speed():
 def get_amps():
     try:
         h['output-amps'] = float(ser.read_register(0x3004, 1))
-    except Exception, e:
+    except Exception as e:
         h['modbus-errors'] += 1
         print("Error reading register 0x3004: " + str(e))
 
@@ -144,21 +144,21 @@ def get_speed():
         speed = float(ser.read_register(0x3005, 0))
         h['speed-fb'] = speed / 60
         h['speed-rpm'] = speed
-    except Exception, e:
+    except Exception as e:
         h['modbus-errors'] += 1
         print("Error reading register 0x3005: " + str(e))
 
 def get_volts():
     try:
         h['output-volts'] = float(ser.read_register(0x3003, 0))
-    except Exception, e:
+    except Exception as e:
         h['modbus-errors'] += 1
         print("Error reading register 0x3003: " + str(e))
 
 def get_faults():
     try:
         h['fault-info'] = float(ser.read_register(0x5000, 0))
-    except Exception, e:
+    except Exception as e:
         h['modbus-errors'] += 1
         print("Error reading register 0x5000: " + str(e))
 

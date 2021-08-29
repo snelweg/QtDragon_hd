@@ -90,13 +90,16 @@ class Hole_Circle(QtWidgets.QWidget):
         self.layout_preview.insertWidget(0, self.preview)
 
         # set up Help messagebox
-        help_file = open("hole_circle_help.txt", "r")
-        help_text = help_file.read()
         self.mb = QMessageBox()
         self.mb.setIcon(QMessageBox.Information)
         self.mb.setWindowTitle("Hole Circle Help")
-        self.mb.setText(help_text)
         self.mb.setStandardButtons(QMessageBox.Ok)
+        if os.path.isfile("hole_circle_help.txt"):
+            help_file = open("hole_circle_help.txt", "r")
+            help_text = help_file.read()
+            self.mb.setText(help_text)
+        else:
+            self.mb.setText("No help file was found")
 
         # set valid input formats for lineEdits
         self.lineEdit_spindle.setValidator(QtGui.QDoubleValidator(0, 99999, 0))

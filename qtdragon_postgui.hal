@@ -25,9 +25,13 @@ net at_speed_fwd     spindle.0.at-speed <= and2.0.out
 net at_speed_fwd     qtdragon.hal_led_atspeed
 
 # external offset stuff
-net eoffset_enable   qtdragon.eoffset_enable => axis.z.eoffset-enable
 net eoffset_clear    qtdragon.eoffset_clear => axis.z.eoffset-clear
 net eoffset_count    qtdragon.eoffset_count => axis.z.eoffset-counts
 net eoffset          qtdragon.eoffset_value <= axis.z.eoffset
 net limited          qtdragon.hal_led_limit <= motion.eoffset-limited
+setp axis.z.eoffset-enable 1
 setp axis.z.eoffset-scale 1.0
+
+## mux4 selects for MPG scales
+net scale_0           qtdragon.scale_select_0 => mux4.0.sel0
+net scale_1           qtdragon.scale_select_1 => mux4.0.sel1

@@ -64,7 +64,6 @@ class HandlerClass:
         self.reload_tool = 0
         self.last_loaded_program = ""
         self.first_turnon = True
-
         self.groupbox_titles = ['PREVIEW',
                                 'FILE',
                                 'OFFSETS',
@@ -86,7 +85,7 @@ class HandlerClass:
                           'btn_load_file': 'SP_DialogOpenButton'}
 
         self.unit_label_list = ["zoffset_units", "max_probe_units"]
-        self.unit_speed_list = ["jog_linear", "maxv_units", "max_rapid_units", "search_vel_units", "probe_vel_units"]
+        self.unit_speed_list = ["search_vel_units", "probe_vel_units"]
 
         self.lineedit_list = ["work_height", "touch_height", "sensor_height", "laser_x", "laser_y",
                               "sensor_x", "sensor_y", "camera_x", "camera_y",
@@ -132,10 +131,12 @@ class HandlerClass:
         self.w.btn_dimensions.setChecked(True)
         self.w.btn_tool_sensor.setEnabled(self.w.chk_use_tool_sensor.isChecked())
         self.w.page_buttonGroup.buttonClicked.connect(self.main_tab_changed)
-        self.w.filemanager.onUserClicked()    
+        self.w.scale_buttonGroup.buttonClicked.connect(self.mpg_scale_changed)
+        self.w.filemanager.onUserClicked()
         self.w.filemanager_usb.onMediaClicked()
         self.chk_use_tool_sensor_changed(self.w.chk_use_tool_sensor.isChecked())
         self.chk_use_touchplate_changed(self.w.chk_use_touchplate.isChecked())
+        self.chk_use_mpg_changed(self.w.chk_use_mpg.isChecked())
         self.chk_run_from_line_changed(self.w.chk_run_from_line.isChecked())
         self.chk_use_camera_changed(self.w.chk_use_camera.isChecked())
         self.chk_alpha_mode_changed(self.w.chk_alpha_mode.isChecked())
@@ -169,22 +170,32 @@ class HandlerClass:
     #############################
     def init_pins(self):
         # spindle control pins
-        pin = self.h.newpin("spindle_amps", hal.HAL_FLOAT, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.spindle_pwr_changed)
-        pin = self.h.newpin("spindle_volts", hal.HAL_FLOAT, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.spindle_pwr_changed)
-        pin = self.h.newpin("spindle_fault", hal.HAL_U32, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.spindle_fault_changed)
-        pin = self.h.newpin("modbus-errors", hal.HAL_U32, hal.HAL_IN)
-        hal_glib.GPin(pin).connect("value_changed", self.mb_errors_changed)
-        self.h.newpin("spindle_inhibit", hal.HAL_BIT, hal.HAL_OUT)
+        self.spindle_amps = self.h.newpin("spindle_amps", hal.HAL_FLOAT, hal.HAL_IN)
+        self.spindle_volts = self.h.newpin("spindle_volts", hal.HAL_FLOAT, hal.HAL_IN)
+        self.spindle_fault = self.h.newpin("spindle_fault", hal.HAL_U32, hal.HAL_IN)
+        self.modbus_errors = self.h.newpin("modbus-errors", hal.HAL_U32, hal.HAL_IN)
+        self.spindle_inhibit = self.h.newpin("spindle_inhibit", hal.HAL_BIT, hal.HAL_OUT)
+        self.spindle_amps.value_changed.connect(lambda val: self.spindle_pwr_changed(val))
+        self.spindle_volts.value_changed.connect(lambda val: self.spindle_pwr_changed(val))
+        self.spindle_fault.value_changed.connect(lambda val: self.w.lbl_spindle_fault.setText(hex(val)))
+        self.modbus_errors.value_changed.connect(lambda val: self.w.lbl_mb_errors.setText(str(val)))
         # external offset control pins
-        self.h.newpin("eoffset_enable", hal.HAL_BIT, hal.HAL_OUT)
-        self.h.newpin("eoffset_clear", hal.HAL_BIT, hal.HAL_OUT)
-        self.h.newpin("eoffset_count", hal.HAL_S32, hal.HAL_OUT)
-        pin = self.h.newpin("eoffset_value", hal.HAL_FLOAT, hal.HAL_IN)
-        self.h['eoffset_enable'] = True
-        
+        self.eoffset_clear = self.h.newpin("eoffset_clear", hal.HAL_BIT, hal.HAL_OUT)
+        self.eoffset_count = self.h.newpin("eoffset_count", hal.HAL_S32, hal.HAL_OUT)
+        self.eoffset_value = self.h.newpin("eoffset_value", hal.HAL_FLOAT, hal.HAL_IN)
+        # MPG axis select pins
+        self.axis_select_x = self.h.newpin("axis_select_x", hal.HAL_BIT, hal.HAL_IN)
+        self.axis_select_y = self.h.newpin("axis_select_y", hal.HAL_BIT, hal.HAL_IN)
+        self.axis_select_z = self.h.newpin("axis_select_z", hal.HAL_BIT, hal.HAL_IN)
+        self.axis_select_a = self.h.newpin("axis_select_a", hal.HAL_BIT, hal.HAL_IN)
+        self.axis_select_x.value_changed.connect(lambda sel: self.axis_select_changed(sel))
+        self.axis_select_y.value_changed.connect(lambda sel: self.axis_select_changed(sel))
+        self.axis_select_z.value_changed.connect(lambda sel: self.axis_select_changed(sel))
+        self.axis_select_a.value_changed.connect(lambda sel: self.axis_select_changed(sel))
+        # MPG scale select pins
+        self.scale_select_0 = self.h.newpin("scale_select_0", hal.HAL_BIT, hal.HAL_OUT)
+        self.scale_select_1 = self.h.newpin("scale_select_1", hal.HAL_BIT, hal.HAL_OUT)
+
     def init_preferences(self):
         if not self.w.PREFS_:
             self.add_status("CRITICAL - no preference file found, enable preferences in screenoptions widget")
@@ -214,6 +225,7 @@ class HandlerClass:
         self.w.chk_use_virtual.setChecked(self.w.PREFS_.getpref('Use virtual keyboard', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_camera.setChecked(self.w.PREFS_.getpref('Use camera', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_alpha_mode.setChecked(self.w.PREFS_.getpref('Use alpha display mode', False, bool, 'CUSTOM_FORM_ENTRIES'))
+        self.w.chk_use_mpg.setChecked(self.w.PREFS_.getpref('Use MPG jog', False, bool, 'CUSTOM_FORM_ENTRIES'))
         
     def closing_cleanup__(self):
         if not self.w.PREFS_: return
@@ -243,6 +255,7 @@ class HandlerClass:
         self.w.PREFS_.putpref('Use virtual keyboard', self.w.chk_use_virtual.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use camera', self.w.chk_use_camera.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use alpha display mode', self.w.chk_alpha_mode.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Use MPG jog', self.w.chk_use_mpg.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         if self.probe:
             self.probe.closing_cleanup__()
 
@@ -276,7 +289,9 @@ class HandlerClass:
         self.w.filemanager_usb.table.setShowGrid(False)
         self.w.tooloffsetview.setShowGrid(False)
         self.w.offset_table.setShowGrid(False)
-        # move clock to statusbar
+        # move clock, mcodes, gcodes to statusbar
+        self.w.statusbar.addPermanentWidget(self.w.lbl_gcodes)
+        self.w.statusbar.addPermanentWidget(self.w.lbl_mcodes)
         self.w.statusbar.addPermanentWidget(self.w.lbl_clock)
         #set up gcode list
         self.gcodes.setup_list()
@@ -402,7 +417,7 @@ class HandlerClass:
         except Exception as e:
             if is_pressed:
                 LOG.debug('Exception in KEYBINDING:', exc_info=e)
-                print 'Error in, or no function for: %s in handler file for-%s'%(KEYBIND.convert(event),key)
+                print ('Error in, or no function for: %s in handler file for-%s'%(KEYBIND.convert(event),key))
         event.accept()
         return True
 
@@ -414,19 +429,11 @@ class HandlerClass:
         # this calculation assumes the voltage is line to neutral
         # that the current reported by the VFD is total current for all 3 phases
         # and that the synchronous motor spindle has a power factor of 0.9
-        power = float(self.h['spindle_volts'] * self.h['spindle_amps'] * 0.9) # V x I x PF
+        power = float(self.spindle_volts.get() * self.spindle_amps.get() * 0.9) # V x I x PF
         pc_power = (power / float(self.max_spindle_power)) * 100
         if pc_power > 100:
             pc_power = 100
         self.w.spindle_power.setValue(int(pc_power))
-
-    def spindle_fault_changed(self, pin):
-        fault = hex(pin.get())
-        self.w.lbl_spindle_fault.setText(fault)
-
-    def mb_errors_changed(self, pin):
-        errors = pin.get()
-        self.w.lbl_mb_errors.setText(str(errors))
 
     def dialog_return(self, w, message):
         rtn = message.get('RETURN')
@@ -434,17 +441,17 @@ class HandlerClass:
         wait_code = bool(message.get('ID') == '_wait_resume_')
         unhome_code = bool(message.get('ID') == '_unhome_')
         if wait_code and name == 'MESSAGE':
-            self.h['eoffset_clear'] = False
+            self.eoffset_clear.set(False)
         elif unhome_code and name == 'MESSAGE' and rtn is True:
             ACTION.SET_MACHINE_UNHOMED(-1)
 
     def command_stopped(self, obj):
         if self.w.chk_pause_spindle.isChecked():
-            self.h['eoffset_clear'] = True
-            self.h['eoffset_count'] = 0
-            self.h['spindle_inhibit'] = False
+            self.eoffset_clear.set(True)
+            self.eoffset_count.set(0)
+            self.spindle_inhibit.set(False)
             self.w.btn_pause_spindle.setChecked(False)
-            self.h['eoffset_clear'] = False
+            self.eoffset_clear.set(False)
 
     def user_system_changed(self, data):
         sys = self.system_list[int(data) - 1]
@@ -570,6 +577,20 @@ class HandlerClass:
         self.w.main_tab_widget.setCurrentIndex(index)
         self.w.frame_backplot.setTitle(self.groupbox_titles[index])
 
+    def mpg_scale_changed(self, btn):
+        if not self.w.chk_use_mpg.isChecked():
+            return
+        self.scale_select_0.set(btn.property('sel0'))
+        self.scale_select_1.set(btn.property('sel1'))
+
+    def axis_select_changed(self, btn):
+        if not self.w.chk_use_mpg.isChecked(): return
+        for i in ('x', 'y', 'z', 'a'):
+            if self['axis_select_' + i] is True:
+                self.w['dro_axis_' + i].setStyleSheet("border: 2px solid #04a9d7;")
+            else:
+                self.w['dro_axis_' + i].setStyleSheet("border: 2px solid #c0c0c0;")
+
     # gcode frame
     def cmb_gcode_history_clicked(self):
         if self.w.cmb_gcode_history.currentIndex() == 0: return
@@ -613,14 +634,14 @@ class HandlerClass:
                 self.w.btn_pause_spindle.setText("SPINDLE\nPAUSED")
             # set external offsets to lift spindle
                 fval = float(self.w.lineEdit_eoffset_count.text())
-                self.h['eoffset_count'] = int(fval)
-                self.h['spindle_inhibit'] = True
+                self.eoffset_count.set(int(fval))
+                self.spindle_inhibit.set(True)
                 self.add_status("Spindle paused")
             else:
                 self.w.btn_pause_spindle.setText("PAUSE\nSPINDLE")
-                self.h['eoffset_count'] = 0
-                self.h['eoffset_clear'] = True
-                self.h['spindle_inhibit'] = False
+                self.eoffset_count.set(0)
+                self.eoffset_clear.set(True)
+                self.spindle_inhibit.set(False)
                 # instantiate warning box
                 info = "Wait for spindle at speed signal before resuming"
                 mess = {'NAME':'MESSAGE', 'ICON':'WARNING', 'ID':'_wait_resume_', 'MESSAGE':'CAUTION', 'MORE':info, 'TYPE':'OK'}
@@ -866,6 +887,13 @@ class HandlerClass:
         if not state:
             self.w.stackedWidget_dro.setCurrentIndex(0)
 
+    def chk_use_mpg_changed(self, state):
+        if not state:
+            self.scale_select_0.set(1)
+            self.scale_select_1.set(1)
+            for i in ('x', 'y', 'z', 'a'):
+                self.w['dro_axis_' + i].setStyleSheet("border: 2px solid #c0c0c0;")
+
     def apply_stylesheet_clicked(self):
         if self.w.cmb_stylesheet.currentText() == "As Loaded": return
         self.styleeditor.styleSheetCombo.setCurrentIndex(self.w.cmb_stylesheet.currentIndex())
@@ -894,8 +922,8 @@ class HandlerClass:
             self.add_status("Unknown or invalid filename")
 
     def disable_spindle_pause(self):
-        self.h['eoffset_count'] = 0
-        self.h['spindle_inhibit'] = False
+        self.eoffset_count.set(0)
+        self.spindle_inhibit.set(False)
         if self.w.btn_pause_spindle.isChecked():
             self.w.btn_pause_spindle.setChecked(False)
 
@@ -963,7 +991,7 @@ class HandlerClass:
         text = "ON" if state else "OFF"
         self.add_status("Machine " + text)
         self.w.btn_pause_spindle.setChecked(False)
-        self.h['eoffset_count'] = 0
+        self.eoffset_count.set(0)
         for widget in self.onoff_list:
             self.w["frame_" + widget].setEnabled(state)
 

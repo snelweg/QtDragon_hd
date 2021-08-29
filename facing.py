@@ -17,13 +17,16 @@ class Facing(QtWidgets.QWidget):
             print("Error: ", e)
 
         # set up Help messagebox
-        help_file = open("facing_help.txt", "r")
-        help_text = help_file.read()
         self.mb = QMessageBox()
         self.mb.setIcon(QMessageBox.Information)
         self.mb.setWindowTitle("Facing Help")
-        self.mb.setText(help_text)
         self.mb.setStandardButtons(QMessageBox.Ok)
+        if os.path.isfile("facing_help.txt"):
+            help_file = open("facing_help.txt", "r")
+            help_text = help_file.read()
+            self.mb.setText(help_text)
+        else:
+            self.mb.setText("No help file was found")
 
         # set valid input formats for lineEdits
         self.lineEdit_tool.setValidator(QtGui.QDoubleValidator(0, 999, 3))
@@ -70,11 +73,11 @@ class Facing(QtWidgets.QWidget):
 
     def raster_changed(self):
         if self.rbtn_raster_0.isChecked():
-            pixmap = QtGui.QPixmap('images/raster_0.png')
+            pixmap = QtGui.QPixmap('qtdragon/images/raster_0.png')
         elif self.rbtn_raster_45.isChecked():
-            pixmap = QtGui.QPixmap('images/raster_45.png')
+            pixmap = QtGui.QPixmap('qtdragon/images/raster_45.png')
         elif self.rbtn_raster_90.isChecked():
-            pixmap = QtGui.QPixmap('images/raster_90.png')
+            pixmap = QtGui.QPixmap('qtdragon/images/raster_90.png')
         self.lbl_image.setPixmap(pixmap)
 
     def validate(self):
