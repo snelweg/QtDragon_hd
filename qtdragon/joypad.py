@@ -17,7 +17,7 @@ class JoyPad(QtWidgets.QWidget):
         self.top_image = None
         self.bottom_image = None
         self.center_image = None
-        self.highlight_color = '#808080'
+        self.highlight_color = 'gray'
         self.highlight_left = False
         self.highlight_right = False
         self.highlight_top = False
@@ -30,7 +30,6 @@ class JoyPad(QtWidgets.QWidget):
         self.btn_names = {'L': 'left', 'R': 'right', 'T': 'top', 'B': 'bottom', 'C': 'center'}
         self.tooltips = {'L': '', 'R': '', 'T': '', 'B': '', 'C': ''}
         self.axis_list = ('X', 'Y', 'Z', 'A')
-        self.btn_list = ('R', 'T', 'L', 'B', 'C')
 
     def eventFilter(self, obj, event):
         if obj is self:
@@ -85,12 +84,12 @@ class JoyPad(QtWidgets.QWidget):
         center = event.rect().center()
         self.rect1.moveCenter(center)
         self.rect2.moveCenter(center)
-        xm_start = QPointF(self.rect1.topLeft())
-        xp_start = QPointF(self.rect1.bottomRight())
-        ym_start = QPointF(self.rect1.bottomLeft())
-        yp_start = QPointF(self.rect1.topRight())
+        left_start = QPointF(self.rect1.topLeft())
+        right_start = QPointF(self.rect1.bottomRight())
+        bottom_start = QPointF(self.rect1.bottomLeft())
+        top_start = QPointF(self.rect1.topRight())
         path = (self.right_path, self.top_path, self.left_path, self.bottom_path)
-        start = (xp_start, yp_start, xm_start, ym_start)
+        start = (right_start, top_start, left_start, bottom_start)
         angle = -45
         for i in range(4):
             path[i].moveTo(start[i])
@@ -179,7 +178,7 @@ class JoyPad(QtWidgets.QWidget):
             qp.drawArc(rect, 0, 5760)
 
     def set_highlight(self, btn, state):
-        if btn not in self.axis_list and btn not in self.btn_list: return
+        if btn not in self.axis_list and btn not in self.btn_names.keys(): return
         if btn == 'X' or btn == 'A':
             self.highlight_left = state
             self.highlight_right = state
@@ -192,25 +191,31 @@ class JoyPad(QtWidgets.QWidget):
         self.update()
 
     def set_icon(self, btn, kind, data):
-        if btn not in self.btn_list: return
+        if btn not in self.btn_names.keys(): return
         name = self.btn_names[btn]
         if kind == 'image':
             self[name + "_image"] = QPixmap(data)
         elif kind == 'text':
             self[name + "_image"] = data
+        else: return
         self.update()
 
     def set_tooltip(self, btn, tip):
-        if btn in self.btn_list:
+        if btn in self.btn_names.keys():
             self.tooltips[btn] = tip
+
+    @QtCore.pyqtSlot(str)
+    def set_highlight_color(self, color):
+        self.highlight_color = color
+        self.update()
 
     def get_highlight_color(self):
         return self.highlight_color
-    def set_highlight_color(self, color):
-        if self.highlight_color != color:
-            self.highlight_color = color
-            self.update()
-    HighlightColor = QtCore.pyqtProperty(str, get_highlight_color, set_highlight_color)
+
+    def reset_highlight_color(self):
+        self.highlight_color = 'gray'
+
+    HighlightColor = QtCore.pyqtProperty(str, get_highlight_color, set_highlight_color, reset_highlight_color)
 
     @QtCore.pyqtSlot(str)
     def btn_clicked(self, btn):
@@ -225,6 +230,7 @@ class JoyPad(QtWidgets.QWidget):
 
     def __setitem__(self, item, value):
         return setattr(self, item, value)
+
     #############################
     # Testing                   #
     #############################

@@ -1,10 +1,10 @@
 import os
 import hal, hal_glib
 import linuxcnc
-from qtdragon.connections import Connections
-from qtdragon.joypad import JoyPad
-from qtdragon.facing import Facing
-from qtdragon.hole_circle import Hole_Circle
+from connections import Connections
+from joypad import JoyPad
+from facing import Facing
+from hole_circle import Hole_Circle
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWebKitWidgets import QWebView, QWebPage
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
