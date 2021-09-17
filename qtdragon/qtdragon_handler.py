@@ -1,7 +1,11 @@
 import os
 import hal, hal_glib
-from connections import Connections
-from PyQt5 import QtCore, QtWidgets, QtGui
+import linuxcnc
+from qtdragon.connections import Connections
+from qtdragon.joypad import JoyPad
+from qtdragon.facing import Facing
+from qtdragon.hole_circle import Hole_Circle
+from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWebKitWidgets import QWebView, QWebPage
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
 from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET
@@ -49,6 +53,11 @@ class HandlerClass:
         # some global variables
         self.factor = 1.0
         self.probe = None
+        self.pause_dialog = None
+        self.progress = None
+        self.run_color = 'green'
+        self.stop_color = 'red'
+        self.pause_color = 'yellow'
         self.default_setup = os.path.join(PATH.CONFIGPATH, "default_setup.html")
         self.start_line = 0
         self.run_time = 0
@@ -59,29 +68,13 @@ class HandlerClass:
         self.max_spindle_rpm = INFO.MAX_SPINDLE_SPEED
         self.max_spindle_power = INFO.get_error_safe_setting('DISPLAY', 'MAX_SPINDLE_POWER',"0")
         self.max_linear_velocity = INFO.MAX_TRAJ_VELOCITY
+        self.axis_list = INFO.AVAILABLE_AXES
         self.system_list = ["G54","G55","G56","G57","G58","G59","G59.1","G59.2","G59.3"]
         self.slow_jog_factor = 10
         self.reload_tool = 0
         self.last_loaded_program = ""
         self.first_turnon = True
-        self.groupbox_titles = ['PREVIEW',
-                                'FILE',
-                                'OFFSETS',
-                                'TOOL',
-                                'STATUS',
-                                'PROBE',
-                                'CAMVIEW',
-                                'GCODES',
-                                'SETUP',
-                                'UTILITIES',
-                                'SETTINGS']
-
-        self.icon_btns = {'action_pause': 'SP_MediaPause',
-                          'action_stop': 'SP_MediaStop',
-                          'action_step': 'SP_MediaSkipForward',
-                          'btn_run': 'SP_MediaPlay',
-                          'btn_reload_file': 'SP_MediaSeekBackward',
-                          'action_exit': 'SP_BrowserStop',
+        self.icon_btns = {'action_exit': 'SP_BrowserStop',
                           'btn_load_file': 'SP_DialogOpenButton'}
 
         self.unit_label_list = ["zoffset_units", "max_probe_units"]
@@ -91,11 +84,10 @@ class HandlerClass:
                               "sensor_x", "sensor_y", "camera_x", "camera_y",
                               "search_vel", "probe_vel", "max_probe", "eoffset_count"]
 
-        self.onoff_list = ["program", "tool", "offsets", "touchoff", "dro", "overrides", "feedrate", "spindle"]
+        self.onoff_list = ["program", "tool", "touchoff", "dro", "overrides", "feedrate", "spindle"]
 
         self.axis_a_list = ["status_jog_angular", "dro_axis_a", "action_zero_a", "axistoolbutton_a",
-                            "action_home_a", "widget_jog_angular", "widget_increments_angular",
-                            "a_plus_jogbutton", "a_minus_jogbutton"]
+                            "action_home_a", "widget_jog_angular", "widget_increments_angular"]
 
         STATUS.connect('general', self.dialog_return)
         STATUS.connect('state-on', lambda w: self.enable_onoff(True))
@@ -109,11 +101,11 @@ class HandlerClass:
         STATUS.connect('metric-mode-changed', lambda w, mode: self.metric_mode_changed(mode))
         STATUS.connect('current-feed-rate', lambda w, rate: self.w.gauge_feedrate.update_value(rate))
         STATUS.connect('command-stopped', self.command_stopped)
-        STATUS.connect('file-loaded', self.file_loaded)
+        STATUS.connect('file-loaded', lambda w, filename: self.file_loaded(filename))
         STATUS.connect('homed', self.homed)
         STATUS.connect('all-homed', self.all_homed)
         STATUS.connect('not-all-homed', self.not_all_homed)
-        STATUS.connect('periodic', lambda w: self.update_runtimer())
+        STATUS.connect('periodic', lambda w: self.update_status())
         STATUS.connect('interp-idle', lambda w: self.stop_timer())
 
     def class_patch__(self):
@@ -126,6 +118,7 @@ class HandlerClass:
         self.init_widgets()
         self.init_probe()
         self.init_utils()
+        self.init_joypads()
         self.w.stackedWidget_log.setCurrentIndex(0)
         self.w.stackedWidget_dro.setCurrentIndex(0)
         self.w.btn_dimensions.setChecked(True)
@@ -139,12 +132,11 @@ class HandlerClass:
         self.chk_use_mpg_changed(self.w.chk_use_mpg.isChecked())
         self.chk_run_from_line_changed(self.w.chk_run_from_line.isChecked())
         self.chk_use_camera_changed(self.w.chk_use_camera.isChecked())
-        self.chk_alpha_mode_changed(self.w.chk_alpha_mode.isChecked())
         self.chk_use_virtual_changed(self.w.chk_use_virtual.isChecked())
         self.slider_spindle_ovr_changed(self.w.slider_spindle_ovr.value())
         self.slider_feed_ovr_changed(self.w.slider_feed_ovr.value())
         # hide widgets for A axis if not present
-        if "A" not in INFO.AVAILABLE_AXES:
+        if "A" not in self.axis_list:
             for i in self.axis_a_list:
                 self.w[i].hide()
         # set validators for lineEdit widgets
@@ -188,14 +180,14 @@ class HandlerClass:
         self.axis_select_y = self.h.newpin("axis_select_y", hal.HAL_BIT, hal.HAL_IN)
         self.axis_select_z = self.h.newpin("axis_select_z", hal.HAL_BIT, hal.HAL_IN)
         self.axis_select_a = self.h.newpin("axis_select_a", hal.HAL_BIT, hal.HAL_IN)
-        self.axis_select_x.value_changed.connect(lambda sel: self.axis_select_changed(sel))
-        self.axis_select_y.value_changed.connect(lambda sel: self.axis_select_changed(sel))
-        self.axis_select_z.value_changed.connect(lambda sel: self.axis_select_changed(sel))
-        self.axis_select_a.value_changed.connect(lambda sel: self.axis_select_changed(sel))
+        self.axis_select_x.value_changed.connect(self.show_selected_axis)
+        self.axis_select_y.value_changed.connect(self.show_selected_axis)
+        self.axis_select_z.value_changed.connect(self.show_selected_axis)
+        self.axis_select_a.value_changed.connect(self.show_selected_axis)
         # MPG scale select pins
         self.scale_select_0 = self.h.newpin("scale_select_0", hal.HAL_BIT, hal.HAL_OUT)
         self.scale_select_1 = self.h.newpin("scale_select_1", hal.HAL_BIT, hal.HAL_OUT)
-
+        
     def init_preferences(self):
         if not self.w.PREFS_:
             self.add_status("CRITICAL - no preference file found, enable preferences in screenoptions widget")
@@ -215,7 +207,6 @@ class HandlerClass:
         self.w.lineEdit_probe_vel.setText(str(self.w.PREFS_.getpref('Probe Velocity', 10, float, 'CUSTOM_FORM_ENTRIES')))
         self.w.lineEdit_max_probe.setText(str(self.w.PREFS_.getpref('Max Probe', 10, float, 'CUSTOM_FORM_ENTRIES')))
         self.w.lineEdit_eoffset_count.setText(str(self.w.PREFS_.getpref('Eoffset count', 0, int, 'CUSTOM_FORM_ENTRIES')))
-        self.w.chk_pause_spindle.setChecked(self.w.PREFS_.getpref('Spindle pause', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_reload_program.setChecked(self.w.PREFS_.getpref('Reload program', False, bool,'CUSTOM_FORM_ENTRIES'))
         self.w.chk_reload_tool.setChecked(self.w.PREFS_.getpref('Reload tool', False, bool,'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_keyboard.setChecked(self.w.PREFS_.getpref('Use keyboard', False, bool, 'CUSTOM_FORM_ENTRIES'))
@@ -224,7 +215,6 @@ class HandlerClass:
         self.w.chk_run_from_line.setChecked(self.w.PREFS_.getpref('Run from line', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_virtual.setChecked(self.w.PREFS_.getpref('Use virtual keyboard', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_camera.setChecked(self.w.PREFS_.getpref('Use camera', False, bool, 'CUSTOM_FORM_ENTRIES'))
-        self.w.chk_alpha_mode.setChecked(self.w.PREFS_.getpref('Use alpha display mode', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_mpg.setChecked(self.w.PREFS_.getpref('Use MPG jog', False, bool, 'CUSTOM_FORM_ENTRIES'))
         
     def closing_cleanup__(self):
@@ -245,7 +235,6 @@ class HandlerClass:
         self.w.PREFS_.putpref('Probe Velocity', self.w.lineEdit_probe_vel.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Max Probe', self.w.lineEdit_max_probe.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Eoffset count', self.w.lineEdit_eoffset_count.text().encode('utf-8'), int, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Spindle pause', self.w.chk_pause_spindle.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Reload program', self.w.chk_reload_program.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Reload tool', self.w.chk_reload_tool.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use keyboard', self.w.chk_use_keyboard.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
@@ -254,7 +243,6 @@ class HandlerClass:
         self.w.PREFS_.putpref('Run from line', self.w.chk_run_from_line.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use virtual keyboard', self.w.chk_use_virtual.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use camera', self.w.chk_use_camera.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Use alpha display mode', self.w.chk_alpha_mode.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use MPG jog', self.w.chk_use_mpg.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         if self.probe:
             self.probe.closing_cleanup__()
@@ -289,9 +277,7 @@ class HandlerClass:
         self.w.filemanager_usb.table.setShowGrid(False)
         self.w.tooloffsetview.setShowGrid(False)
         self.w.offset_table.setShowGrid(False)
-        # move clock, mcodes, gcodes to statusbar
-        self.w.statusbar.addPermanentWidget(self.w.lbl_gcodes)
-        self.w.statusbar.addPermanentWidget(self.w.lbl_mcodes)
+        # move clock and runtimer to statusbar
         self.w.statusbar.addPermanentWidget(self.w.lbl_clock)
         #set up gcode list
         self.gcodes.setup_list()
@@ -310,10 +296,6 @@ class HandlerClass:
             style = self.w[key].style()
             icon = style.standardIcon(getattr(QtWidgets.QStyle, self.icon_btns[key]))
             self.w[key].setIcon(icon)
-        # apply styles to jog buttons
-        jog_group = self.w.jog_buttonGroup.buttons()
-        for i in range(len(jog_group)):
-            jog_group[i].setStyleSheet("background: transparent;\nborder: none;")
         # populate stylesheet combobox - basically a copy of styleeditor combobox
         for i in range(self.styleeditor.styleSheetCombo.count()):
             item = self.styleeditor.styleSheetCombo.itemText(i)
@@ -339,12 +321,50 @@ class HandlerClass:
         self.probe.hal_init()
 
     def init_utils(self):
-        from facing import Facing
         self.facing = Facing()
         self.w.layout_facing.addWidget(self.facing)
-        from hole_circle import Hole_Circle
         self.hole_circle = Hole_Circle()
         self.w.layout_hole_circle.addWidget(self.hole_circle)
+
+    def init_joypads(self):
+        # jog A and Z
+        self.jog_az = JoyPad()
+        self.w.layout_jog_buttons.addWidget(self.jog_az)
+        if 'A' in self.axis_list:
+            self.jog_az.set_icon('L', 'text', 'A-')
+            self.jog_az.set_icon('R', 'text', 'A+')
+        if 'Z' in self.axis_list:
+            self.jog_az.set_icon('T', 'text', 'Z+')
+            self.jog_az.set_icon('B', 'text', 'Z-')
+        self.jog_az.joy_btn_clicked.connect(self.jog_az_clicked)
+        self.jog_az.joy_btn_released.connect(self.jog_az_released)
+        # jog X and Y
+        self.jog_xy = JoyPad()
+        self.w.layout_jog_buttons.addWidget(self.jog_xy)
+        if 'X' in self.axis_list:
+            self.jog_xy.set_icon('L', 'text', 'X-')
+            self.jog_xy.set_icon('R', 'text', 'X+')
+        if 'Y' in self.axis_list:
+            self.jog_xy.set_icon('T', 'text', 'Y+')
+            self.jog_xy.set_icon('B', 'text', 'Y-')
+        self.jog_xy.joy_btn_clicked.connect(self.jog_xy_clicked)
+        self.jog_xy.joy_btn_released.connect(self.jog_xy_released)
+        # program controls
+        self.pgm_control = JoyPad()
+        self.w.layout_program_control.addWidget(self.pgm_control)
+        self.pgm_control.set_tooltip('T', "RUN")
+        self.pgm_control.set_tooltip('L', "RELOAD")
+        self.pgm_control.set_tooltip('R', "STEP")
+        self.pgm_control.set_tooltip('B', "PAUSE")
+        self.pgm_control.set_tooltip('C', "STOP")
+        self.pgm_control.set_icon('L', 'image', 'qtdragon/images/reload.png')
+        self.pgm_control.set_icon('R', 'image', 'qtdragon/images/step.png')
+        self.pgm_control.set_icon('T', 'image', 'qtdragon/images/run.png')
+        self.pgm_control.set_icon('B', 'image', 'qtdragon/images/pause.png')
+        self.pgm_control.set_icon('C', 'image', 'qtdragon/images/stop.png')
+        self.pgm_control.set_highlight_color(self.stop_color)
+        self.pgm_control.set_highlight('C', True)
+        self.pgm_control.joy_btn_clicked.connect(self.pgm_control_clicked)
 
     def processed_focus_event__(self, receiver, event):
         if not self.w.chk_use_virtual.isChecked() or STATUS.is_auto_mode(): return
@@ -438,19 +458,21 @@ class HandlerClass:
     def dialog_return(self, w, message):
         rtn = message.get('RETURN')
         name = message.get('NAME')
-        wait_code = bool(message.get('ID') == '_wait_resume_')
         unhome_code = bool(message.get('ID') == '_unhome_')
-        if wait_code and name == 'MESSAGE':
-            self.eoffset_clear.set(False)
-        elif unhome_code and name == 'MESSAGE' and rtn is True:
+        pause_code = bool(message.get('ID') == '_wait_resume_')
+        if unhome_code and name == 'MESSAGE' and rtn is True:
             ACTION.SET_MACHINE_UNHOMED(-1)
-
+        elif pause_code and name == 'MESSAGE':
+            self.eoffset_clear.set(True)
+            self.eoffset_count.set(0)
+            self.spindle_inhibit.set(False)
+            self.eoffset_clear.set(False)
+            
     def command_stopped(self, obj):
         if self.w.chk_pause_spindle.isChecked():
             self.eoffset_clear.set(True)
             self.eoffset_count.set(0)
             self.spindle_inhibit.set(False)
-            self.w.btn_pause_spindle.setChecked(False)
             self.eoffset_clear.set(False)
 
     def user_system_changed(self, data):
@@ -482,7 +504,7 @@ class HandlerClass:
         self.w.lbl_max_rapid.setText("{:4.0f}".format(rapid))
         self.w.lbl_maxv.setText("{:4.0f}".format(maxv))
 
-    def file_loaded(self, obj, filename):
+    def file_loaded(self, filename):
         if filename is not None:
             self.add_status("Loaded file {}".format(filename))
             self.w.progressBar.reset()
@@ -491,21 +513,25 @@ class HandlerClass:
         else:
             self.add_status("Filename not valid")
 
-    def percent_loaded_changed(self, fraction):
-        if fraction < 0:
+    def percent_loaded_changed(self, pc):
+        if pc == self.progress: return
+        self.progress = pc
+        if pc < 0:
             self.w.progressBar.setValue(0)
             self.w.progressBar.setFormat('PROGRESS')
         else:
-            self.w.progressBar.setValue(fraction)
-            self.w.progressBar.setFormat('LOADING: {}%'.format(fraction))
+            self.w.progressBar.setValue(pc)
+            self.w.progressBar.setFormat('LOADING: {}%'.format(pc))
 
-    def percent_done_changed(self, fraction):
-        self.w.progressBar.setValue(fraction)
-        if fraction < 0:
+    def percent_done_changed(self, pc):
+        if pc == self.progress: return
+        self.progress = pc
+        if pc < 0:
             self.w.progressBar.setValue(0)
             self.w.progressBar.setFormat('PROGRESS')
         else:
-            self.w.progressBar.setFormat('COMPLETE: {}%'.format(fraction))
+            self.w.progressBar.setValue(pc)
+            self.w.progressBar.setFormat('COMPLETE: {}%'.format(pc))
 
     def homed(self, obj, joint):
         i = int(joint)
@@ -521,7 +547,9 @@ class HandlerClass:
     def all_homed(self, obj):
         self.home_all = True
         self.w.btn_home_all.setText("ALL\nHOMED")
-        self.w.btn_home_all.setStyleSheet("color: #00FF00")
+        self.w.btn_home_all.setProperty('homed', True)
+        self.w.btn_home_all.style().unpolish(self.w.btn_home_all)
+        self.w.btn_home_all.style().polish(self.w.btn_home_all)
         if self.first_turnon is True:
             self.first_turnon = False
             if self.w.chk_reload_tool.isChecked():
@@ -538,7 +566,9 @@ class HandlerClass:
     def not_all_homed(self, obj, list):
         self.home_all = False
         self.w.btn_home_all.setText("HOME\nALL")
-        self.w.btn_home_all.setStyleSheet("color: #FF0000")
+        self.w.btn_home_all.setProperty('homed', False)
+        self.w.btn_home_all.style().unpolish(self.w.btn_home_all)
+        self.w.btn_home_all.style().polish(self.w.btn_home_all)
         for i in INFO.AVAILABLE_JOINTS:
             if str(i) in list:
                 axis = INFO.GET_NAME_FROM_JOINT.get(i).lower()
@@ -549,6 +579,17 @@ class HandlerClass:
                     widget.style().polish(widget)
                 except:
                     pass
+
+    def update_status(self):
+        # runtimer
+        if self.timer_on is False or STATUS.is_auto_paused(): return
+        self.time_tenths += 1
+        if self.time_tenths == 10:
+            self.time_tenths = 0
+            self.run_time += 1
+            hours, remainder = divmod(self.run_time, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            self.w.lbl_runtime.setText("{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds))
 
     def hard_limit_tripped(self, obj, tripped, list_of_tripped):
         self.add_status("Hard limits tripped")
@@ -575,21 +616,11 @@ class HandlerClass:
             self.w.btn_gcode_edit.setChecked(False)
             self.w.btn_gcode_edit_clicked(False)
         self.w.main_tab_widget.setCurrentIndex(index)
-        self.w.frame_backplot.setTitle(self.groupbox_titles[index])
 
     def mpg_scale_changed(self, btn):
-        if not self.w.chk_use_mpg.isChecked():
-            return
-        self.scale_select_0.set(btn.property('sel0'))
-        self.scale_select_1.set(btn.property('sel1'))
-
-    def axis_select_changed(self, btn):
-        if not self.w.chk_use_mpg.isChecked(): return
-        for i in ('x', 'y', 'z', 'a'):
-            if self['axis_select_' + i] is True:
-                self.w['dro_axis_' + i].setStyleSheet("border: 2px solid #04a9d7;")
-            else:
-                self.w['dro_axis_' + i].setStyleSheet("border: 2px solid #c0c0c0;")
+        if self.w.chk_use_mpg.isChecked():
+            self.scale_select_0.set(btn.property('sel0'))
+            self.scale_select_1.set(btn.property('sel1'))
 
     # gcode frame
     def cmb_gcode_history_clicked(self):
@@ -601,7 +632,31 @@ class HandlerClass:
             ACTION.OPEN_PROGRAM(filename)
 
     # program frame
-    def btn_run_clicked(self, obj):
+    def pgm_control_clicked(self, btn):
+        if btn == 'T':
+            self.btn_run_clicked()
+        elif btn == 'B':
+            if STATUS.is_on_and_idle(): return
+            if STATUS.is_auto_paused():
+                self.pgm_control.set_tooltip('B', "PAUSE")
+                self.pgm_control.set_highlight_color(self.run_color)
+                ACTION.PAUSE()
+            else:
+                self.pgm_control.set_tooltip('B', "RESUME")
+                self.pgm_control.set_highlight_color(self.pause_color)
+                ACTION.PAUSE()
+                if self.w.chk_pause_spindle.isChecked():
+                    self.pause_spindle()
+        elif btn == "L":
+            self.btn_reload_file_clicked()
+        elif btn == "R":
+            ACTION.STEP()
+        elif btn == "C":
+            ACTION.ABORT()
+            self.pgm_control.set_tooltip('B', "PAUSE")
+            self.pgm_control.set_highlight_color(self.stop_color)
+
+    def btn_run_clicked(self):
         if self.w.main_tab_widget.currentIndex() != 0:
             return
         if not STATUS.is_auto_mode():
@@ -610,6 +665,7 @@ class HandlerClass:
         if STATUS.is_auto_running():
             self.add_status("Program is already running")
             return
+        self.pgm_control.set_highlight_color(self.run_color)
         self.run_time = 0
         self.w.lbl_runtime.setText("00:00:00")
         if self.start_line <= 1:
@@ -622,38 +678,82 @@ class HandlerClass:
         self.add_status("Started program from line {}".format(self.start_line))
         self.timer_on = True
 
-    def btn_pause_spindle_clicked(self, state):
-        if not self.w.chk_pause_spindle.isChecked():
-            self.w.btn_pause_spindle.setChecked(False)
-            self.add_status("Spindle pause is disabled")
-            return
-        if STATUS.is_auto_paused():
-            self.w.action_pause.setEnabled(not state)
-            self.w.action_step.setEnabled(not state)
-            if state:
-                self.w.btn_pause_spindle.setText("SPINDLE\nPAUSED")
-            # set external offsets to lift spindle
-                fval = float(self.w.lineEdit_eoffset_count.text())
-                self.eoffset_count.set(int(fval))
-                self.spindle_inhibit.set(True)
-                self.add_status("Spindle paused")
-            else:
-                self.w.btn_pause_spindle.setText("PAUSE\nSPINDLE")
-                self.eoffset_count.set(0)
-                self.eoffset_clear.set(True)
-                self.spindle_inhibit.set(False)
-                # instantiate warning box
-                info = "Wait for spindle at speed signal before resuming"
-                mess = {'NAME':'MESSAGE', 'ICON':'WARNING', 'ID':'_wait_resume_', 'MESSAGE':'CAUTION', 'MORE':info, 'TYPE':'OK'}
-                ACTION.CALL_DIALOG(mess)
-        else:
-            self.w.btn_pause_spindle.setChecked(False)
+    def pause_spindle(self):
+        # set external offsets to lift spindle
+        fval = float(self.w.lineEdit_eoffset_count.text())
+        self.eoffset_count.set(int(fval))
+        self.spindle_inhibit.set(True)
+        self.add_status("Spindle paused")
+        # instantiate warning box
+        info = "Wait for spindle at speed signal before resuming"
+        mess = {'NAME':'MESSAGE', 'ICON':'WARNING', 'ID':'_wait_resume_', 'MESSAGE':'CAUTION', 'MORE':info, 'TYPE':'OK'}
+        ACTION.CALL_DIALOG(mess)
 
     def btn_reload_file_clicked(self):
         if self.last_loaded_program:
             self.w.progressBar.reset()
             self.add_status("Loaded program file {}".format(self.last_loaded_program))
             ACTION.OPEN_PROGRAM(self.last_loaded_program)
+
+    def chk_run_from_line_changed(self, state):
+        self.w.gcodegraphics.set_inhibit_selection(not state)
+        text = "ENABLED" if state else "DISABLED"
+        self.w.lbl_start_line.setText(text)
+        if not state:
+            self.start_line = 1
+
+    def chk_pause_spindle_changed(self, state):
+        text = 'ENABLED' if state else 'DISABLED'
+        self.w.lbl_spindle_pause.setText(text)
+
+    # jogging frame
+    def jog_xy_clicked(self, btn):
+        if btn not in ("L", "R", "T", "B"): return
+        axis = 0 if btn == "L" or btn == "R" else 1
+        direction = 1 if btn == "T" or btn == "R" else -1
+        ACTION.ensure_mode(linuxcnc.MODE_MANUAL)
+        ACTION.DO_JOG(axis, direction)
+
+    def jog_xy_released(self, btn):
+        if btn not in ("L", "R", "T", "B"): return
+        if STATUS.get_jog_increment() != 0: return
+        axis = 0 if btn == "L" or btn == "R" else 1
+        ACTION.ensure_mode(linuxcnc.MODE_MANUAL)
+        ACTION.DO_JOG(axis, 0)
+
+    def jog_az_clicked(self, btn):
+        if btn not in ("L", "R", "T", "B"): return
+        axis = 3 if btn == "L" or btn == "R" else 2
+        direction = 1 if btn == "T" or btn == "R" else -1
+        ACTION.ensure_mode(linuxcnc.MODE_MANUAL)
+        ACTION.DO_JOG(axis, direction)
+
+    def jog_az_released(self, btn):
+        if btn not in ("L", "R", "T", "B"): return
+        if STATUS.get_jog_increment() != 0: return
+        axis = 3 if btn == "L" or btn == "R" else 2
+        ACTION.ensure_mode(linuxcnc.MODE_MANUAL)
+        ACTION.DO_JOG(axis, 0)
+
+    def chk_use_mpg_changed(self, state):
+        if not state:
+            self.scale_select_0.set(1)
+            self.scale_select_1.set(1)
+            if "X" in self.axis_list: self.jog_xy.set_highlight('X', True)
+            if "Y" in self.axis_list: self.jog_xy.set_highlight('Y', True)
+            if "Z" in self.axis_list: self.jog_az.set_highlight('Z', True)
+            if "A" in self.axis_list: self.jog_az.set_highlight('A', True)
+        else:
+            self.show_selected_axis(None)
+            if   self.w.btn_scale_1.isChecked():
+                self.scale_select_0.set(self.w.btn_scale_1.property('sel0'))
+                self.scale_select_1.set(self.w.btn_scale_1.property('sel1'))
+            elif self.w.btn_scale_10.isChecked():
+                self.scale_select_0.set(self.w.btn_scale_10.property('sel0'))
+                self.scale_select_1.set(self.w.btn_scale_10.property('sel1'))
+            elif self.w.btn_scale_100.isChecked():
+                self.scale_select_0.set(self.w.btn_scale_100.property('sel0'))
+                self.scale_select_1.set(self.w.btn_scale_100.property('sel1'))
 
     # offsets frame
     def btn_goto_location_clicked(self):
@@ -700,7 +800,6 @@ class HandlerClass:
         if not STATUS.is_all_homed():
             self.add_status("Must be homed to perform tool touchoff")
             return
-        # instantiate dialog box
         sensor = self.w.sender().property('sensor')
         self.touchoff(sensor)
 
@@ -852,14 +951,7 @@ class HandlerClass:
         else:
             print("Override limits not set")
 
-    def chk_run_from_line_changed(self, state):
-        self.w.gcodegraphics.set_inhibit_selection(not state)
-        text = "ENABLED" if state else "DISABLED"
-        self.w.lbl_start_line.setText(text)
-        if not state:
-            self.start_line = 1
-
-    def chk_alpha_mode_changed(self, state):
+    def alpha_mode_clicked(self, state):
         self.w.gcodegraphics.set_alpha_mode(state)
 
     def chk_use_camera_changed(self, state):
@@ -887,13 +979,6 @@ class HandlerClass:
         if not state:
             self.w.stackedWidget_dro.setCurrentIndex(0)
 
-    def chk_use_mpg_changed(self, state):
-        if not state:
-            self.scale_select_0.set(1)
-            self.scale_select_1.set(1)
-            for i in ('x', 'y', 'z', 'a'):
-                self.w['dro_axis_' + i].setStyleSheet("border: 2px solid #c0c0c0;")
-
     def apply_stylesheet_clicked(self):
         if self.w.cmb_stylesheet.currentText() == "As Loaded": return
         self.styleeditor.styleSheetCombo.setCurrentIndex(self.w.cmb_stylesheet.currentIndex())
@@ -902,6 +987,14 @@ class HandlerClass:
     #####################
     # GENERAL FUNCTIONS #
     #####################
+    def show_selected_axis(self, obj):
+        if self.w.chk_use_mpg.isChecked():
+            self.jog_xy.set_highlight('X', bool(self.axis_select_x.get() is True))
+            self.jog_xy.set_highlight('Y', bool(self.axis_select_y.get() is True))
+            self.jog_az.set_highlight('Z', bool(self.axis_select_z.get() is True))
+            if 'A' in self.axis_list:
+                self.jog_az.set_highlight('A', bool(self.axis_select_a.get() is True))
+
     def load_code(self, fname):
         if fname is None: return
         if fname.endswith(".ngc") or fname.endswith(".py"):
@@ -924,8 +1017,6 @@ class HandlerClass:
     def disable_spindle_pause(self):
         self.eoffset_count.set(0)
         self.spindle_inhibit.set(False)
-        if self.w.btn_pause_spindle.isChecked():
-            self.w.btn_pause_spindle.setChecked(False)
 
     def touchoff(self, selector):
         if selector == 'touchplate':
@@ -990,10 +1081,12 @@ class HandlerClass:
     def enable_onoff(self, state):
         text = "ON" if state else "OFF"
         self.add_status("Machine " + text)
-        self.w.btn_pause_spindle.setChecked(False)
         self.eoffset_count.set(0)
         for widget in self.onoff_list:
             self.w["frame_" + widget].setEnabled(state)
+        self.jog_xy.setEnabled(state)
+        self.jog_az.setEnabled(state)
+        self.pgm_control.setEnabled(state)
 
     def set_start_line(self, line):
         self.w.gcodegraphics.highlight_graphics(line)
@@ -1008,21 +1101,12 @@ class HandlerClass:
             self.add_status('Keyboard shortcuts are disabled')
             return False
 
-    def update_runtimer(self):
-        if self.timer_on is False or STATUS.is_auto_paused(): return
-        self.time_tenths += 1
-        if self.time_tenths == 10:
-            self.time_tenths = 0
-            self.run_time += 1
-            hours, remainder = divmod(self.run_time, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            self.w.lbl_runtime.setText("{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds))
-
     def stop_timer(self):
+        self.pgm_control.set_highlight_color(self.stop_color)
         if self.timer_on:
             self.timer_on = False
             self.add_status("Run timer stopped at {}".format(self.w.lbl_runtime.text()))
-
+        
     #####################
     # KEY BINDING CALLS #
     #####################
