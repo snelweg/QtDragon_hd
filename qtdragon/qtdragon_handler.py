@@ -86,8 +86,8 @@ class HandlerClass:
 
         self.onoff_list = ["program", "tool", "touchoff", "dro", "overrides", "feedrate", "spindle"]
 
-        self.axis_a_list = ["status_jog_angular", "dro_axis_a", "action_zero_a", "axistoolbutton_a",
-                            "action_home_a", "widget_jog_angular", "widget_increments_angular"]
+        self.axis_a_list = ["widget_jog_angular", "widget_increments_angular", "dro_axis_a",
+                            "axistoolbutton_a", "btn_zero_a", "btn_goto_zero_a"]
 
         STATUS.connect('general', self.dialog_return)
         STATUS.connect('state-on', lambda w: self.enable_onoff(True))
@@ -120,7 +120,6 @@ class HandlerClass:
         self.init_utils()
         self.init_joypads()
         self.w.stackedWidget_log.setCurrentIndex(0)
-        self.w.stackedWidget_dro.setCurrentIndex(0)
         self.w.btn_dimensions.setChecked(True)
         self.w.btn_tool_sensor.setEnabled(self.w.chk_use_tool_sensor.isChecked())
         self.w.page_buttonGroup.buttonClicked.connect(self.main_tab_changed)
@@ -132,13 +131,12 @@ class HandlerClass:
         self.chk_use_mpg_changed(self.w.chk_use_mpg.isChecked())
         self.chk_run_from_line_changed(self.w.chk_run_from_line.isChecked())
         self.chk_use_camera_changed(self.w.chk_use_camera.isChecked())
-        self.chk_use_virtual_changed(self.w.chk_use_virtual.isChecked())
         self.slider_spindle_ovr_changed(self.w.slider_spindle_ovr.value())
         self.slider_feed_ovr_changed(self.w.slider_feed_ovr.value())
         # hide widgets for A axis if not present
         if "A" not in self.axis_list:
             for i in self.axis_a_list:
-                self.w[i].hide()
+                self.w[i].setEnabled(False)
         # set validators for lineEdit widgets
         for val in self.lineedit_list:
             self.w['lineEdit_' + val].setValidator(self.valid)
@@ -213,7 +211,6 @@ class HandlerClass:
         self.w.chk_use_tool_sensor.setChecked(self.w.PREFS_.getpref('Use tool sensor', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_touchplate.setChecked(self.w.PREFS_.getpref('Use tool touchplate', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_run_from_line.setChecked(self.w.PREFS_.getpref('Run from line', False, bool, 'CUSTOM_FORM_ENTRIES'))
-        self.w.chk_use_virtual.setChecked(self.w.PREFS_.getpref('Use virtual keyboard', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_camera.setChecked(self.w.PREFS_.getpref('Use camera', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_mpg.setChecked(self.w.PREFS_.getpref('Use MPG jog', False, bool, 'CUSTOM_FORM_ENTRIES'))
         
@@ -222,26 +219,25 @@ class HandlerClass:
         self.w.PREFS_.putpref('last_loaded_directory', os.path.dirname(self.last_loaded_program), str, 'BOOK_KEEPING')
         self.w.PREFS_.putpref('last_loaded_file', self.last_loaded_program, str, 'BOOK_KEEPING')
         self.w.PREFS_.putpref('Tool to load', STATUS.get_current_tool(), int, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Laser X', self.w.lineEdit_laser_x.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Laser Y', self.w.lineEdit_laser_y.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Sensor X', self.w.lineEdit_sensor_x.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Sensor Y', self.w.lineEdit_sensor_y.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Camera X', self.w.lineEdit_camera_x.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Camera Y', self.w.lineEdit_camera_y.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Work Height', self.w.lineEdit_work_height.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Touch Height', self.w.lineEdit_touch_height.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Sensor Height', self.w.lineEdit_sensor_height.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Search Velocity', self.w.lineEdit_search_vel.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Probe Velocity', self.w.lineEdit_probe_vel.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Max Probe', self.w.lineEdit_max_probe.text().encode('utf-8'), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Eoffset count', self.w.lineEdit_eoffset_count.text().encode('utf-8'), int, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Laser X', self.w.lineEdit_laser_x.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Laser Y', self.w.lineEdit_laser_y.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Sensor X', self.w.lineEdit_sensor_x.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Sensor Y', self.w.lineEdit_sensor_y.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Camera X', self.w.lineEdit_camera_x.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Camera Y', self.w.lineEdit_camera_y.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Work Height', self.w.lineEdit_work_height.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Touch Height', self.w.lineEdit_touch_height.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Sensor Height', self.w.lineEdit_sensor_height.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Search Velocity', self.w.lineEdit_search_vel.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Probe Velocity', self.w.lineEdit_probe_vel.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Max Probe', self.w.lineEdit_max_probe.text(), float, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Eoffset count', self.w.lineEdit_eoffset_count.text(), int, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Reload program', self.w.chk_reload_program.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Reload tool', self.w.chk_reload_tool.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use keyboard', self.w.chk_use_keyboard.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use tool sensor', self.w.chk_use_tool_sensor.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use tool touchplate', self.w.chk_use_touchplate.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Run from line', self.w.chk_run_from_line.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Use virtual keyboard', self.w.chk_use_virtual.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use camera', self.w.chk_use_camera.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use MPG jog', self.w.chk_use_mpg.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         if self.probe:
@@ -366,16 +362,6 @@ class HandlerClass:
         self.pgm_control.set_highlight('C', True)
         self.pgm_control.joy_btn_clicked.connect(self.pgm_control_clicked)
 
-    def processed_focus_event__(self, receiver, event):
-        if not self.w.chk_use_virtual.isChecked() or STATUS.is_auto_mode(): return
-        if isinstance(receiver, QtWidgets.QLineEdit):
-            if not receiver.isReadOnly():
-                self.w.stackedWidget_dro.setCurrentIndex(1)
-        elif isinstance(receiver, QtWidgets.QTableView):
-            self.w.stackedWidget_dro.setCurrentIndex(1)
-        elif isinstance(receiver, QtWidgets.QCommonStyle):
-            return
-    
     def processed_key_event__(self,receiver,event,is_pressed,key,code,shift,cntrl):
         # when typing in MDI, we don't want keybinding to call functions
         # so we catch and process the events directly.
@@ -610,9 +596,7 @@ class HandlerClass:
             self.w.main_tab_widget.setCurrentIndex(TAB_MAIN)
             self.w.btn_main.setChecked(True)
             return
-        if index == TAB_MAIN:
-            self.w.stackedWidget_dro.setCurrentIndex(0)
-        elif index == TAB_FILE and self.w.btn_gcode_edit.isChecked():
+        if index == TAB_FILE and self.w.btn_gcode_edit.isChecked():
             self.w.btn_gcode_edit.setChecked(False)
             self.w.btn_gcode_edit_clicked(False)
         self.w.main_tab_widget.setCurrentIndex(index)
@@ -625,7 +609,7 @@ class HandlerClass:
     # gcode frame
     def cmb_gcode_history_clicked(self):
         if self.w.cmb_gcode_history.currentIndex() == 0: return
-        filename = self.w.cmb_gcode_history.currentText().encode('utf-8')
+        filename = self.w.cmb_gcode_history.currentText()
         if filename == self.last_loaded_program:
             self.add_status("Selected program is already loaded")
         else:
@@ -758,30 +742,24 @@ class HandlerClass:
     # offsets frame
     def btn_goto_location_clicked(self):
         dest = self.w.sender().property('location')
-        try:
-            if dest == 'home':
-                x = float(self.w.lbl_home_x.text())
-                y = float(self.w.lbl_home_y.text())
-            elif dest == 'sensor':
-                x = float(self.w.lineEdit_sensor_x.text())
-                y = float(self.w.lineEdit_sensor_y.text())
-            elif dest == 'zero':
-                ACTION.CALL_MDI("G90")
-                ACTION.CALL_MDI_WAIT("G53 G0 Z0")
-                ACTION.CALL_MDI_WAIT("G0 x0 Y0", 10)
-                return
-            else:
-                return
-        except Exception as e:
-            self.add_status("Error reading location value: {}".format(e))
-            return
-        if not STATUS.is_metric_mode():
-            x = x / 25.4
-            y = y / 25.4
+        factor = 1 if STATUS.is_metric_mode() else 1/25.4
         ACTION.CALL_MDI("G90")
-        ACTION.CALL_MDI_WAIT("G53 G0 Z0")
-        command = "G53 G0 X{:3.4f} Y{:3.4f}".format(x, y)
-        ACTION.CALL_MDI_WAIT(command, 10)
+        if dest == 'home':
+            x = float(self.w.lbl_home_x.text()) * factor
+            y = float(self.w.lbl_home_y.text()) * factor
+            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
+            command = "G53 G0 X{:3.4f} Y{:3.4f}".format(x, y)
+        elif dest == 'sensor':
+            x = float(self.w.lineEdit_sensor_x.text()) * factor
+            y = float(self.w.lineEdit_sensor_y.text()) * factor
+            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
+            command = "G53 G0 X{:3.4f} Y{:3.4f}".format(x, y)
+        elif dest == 'zero':
+            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
+            command = "G0 X0 Y0"
+        elif dest == 'zero_a':
+            command = "G0 A0"
+        ACTION.CALL_MDI_WAIT(command,10)
 
     def btn_ref_laser_clicked(self):
         x = float(self.w.lineEdit_laser_x.text())
@@ -812,6 +790,9 @@ class HandlerClass:
             info = "Unhome All Axes?"
             mess = {'NAME':'MESSAGE', 'ID':'_unhome_', 'MESSAGE':'UNHOME ALL', 'MORE':info, 'TYPE':'OKCANCEL'}
             ACTION.CALL_DIALOG(mess)
+
+    def btn_zero_a_clicked(self):
+        ACTION.SET_AXIS_ORIGIN('A', 0)
 
     # override frame
     def slow_button_clicked(self, state):
@@ -913,7 +894,7 @@ class HandlerClass:
 
     def btn_save_status_clicked(self):
         text = self.w.machinelog.toPlainText()
-        filename = self.w.lbl_clock.text().encode('utf-8')
+        filename = self.w.lbl_clock.text()
         filename = 'status_' + filename.replace(' ','_') + '.txt'
         self.add_status("Saving Status file to {}".format(filename))
         with open(filename, 'w') as f:
@@ -969,15 +950,6 @@ class HandlerClass:
     def chk_use_touchplate_changed(self, state):
         self.w.btn_touchplate.setEnabled(state)
         self.w.widget_touchplate_height.setEnabled(state)
-
-    def chk_use_virtual_changed(self, state):
-        codestring = "CALCULATOR" if state else "ENTRY"
-        for i in ("x", "y", "z", "a"):
-            self.w["axistoolbutton_" + i].set_dialog_code(codestring)
-        if self.probe:
-            self.probe.dialog_code = "NONE"
-        if not state:
-            self.w.stackedWidget_dro.setCurrentIndex(0)
 
     def apply_stylesheet_clicked(self):
         if self.w.cmb_stylesheet.currentText() == "As Loaded": return
@@ -1076,7 +1048,6 @@ class HandlerClass:
         if state:
             self.w.btn_main.setChecked(True)
             self.w.main_tab_widget.setCurrentIndex(TAB_MAIN)
-            self.w.stackedWidget_dro.setCurrentIndex(0)
 
     def enable_onoff(self, state):
         text = "ON" if state else "OFF"
