@@ -1,5 +1,5 @@
 /* Argentium.qss */
-/* Updated 09/17/21 */
+/* Updated 09/20/21 */
 QMainWindow {
     background: #202020;
 }
@@ -193,6 +193,20 @@ QSlider::handle:vertical {
     border-radius: 2px;
 }
 
+/** Status Adjustment Bars **/
+StatusAdjustmentBar > QProgressBar {
+}
+
+#adj_maxv_ovr > QToolButton,
+#adj_rapid_ovr > QToolButton,
+#adj_feed_ovr > QToolButton,
+#adj_linear_jog > QToolButton,
+#adj_angular_jog > QToolButton,
+#adj_spindle_ovr > QToolButton {
+    min-width: 40px;
+    min-height: 40px;
+}
+
 QProgressBar {
     background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:1 #e0e0e0);
     border: 1px solid #e0e0e0;
@@ -203,7 +217,7 @@ QProgressBar {
 
 QProgressBar::chunk:horizontal {
     margin: 2px;
-    background-color: #00aaff;
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #808080, stop:1 #00aaff);
 }
 
 /** Tables **/

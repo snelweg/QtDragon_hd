@@ -5554,7 +5554,7 @@ CAMERA</string>
                        <number>2</number>
                       </property>
                       <property name="text">
-                       <string>11:21:22 AM</string>
+                       <string>12:39:14 PM</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
@@ -10076,7 +10076,7 @@ SENSOR</string>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_46" stretch="1,0,0,0,0">
+              <layout class="QVBoxLayout" name="verticalLayout_46" stretch="0,0,0,0,0">
                <property name="spacing">
                 <number>8</number>
                </property>
@@ -10094,10 +10094,16 @@ SENSOR</string>
                </property>
                <item>
                 <widget class="QWidget" name="widget_maxv_ovr" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>50</height>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -10106,10 +10112,7 @@ SENSOR</string>
                    <height>50</height>
                   </size>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_39">
-                  <property name="spacing">
-                   <number>4</number>
-                  </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_26">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -10123,37 +10126,9 @@ SENSOR</string>
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QPushButton" name="btn_maxv_ovr_50">
+                   <widget class="StatusAdjustmentBar" name="adj_maxv_ovr">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>50</string>
-                    </property>
-                    <property name="flat">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="StatusSlider" name="slider_maxv_ovr">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
@@ -10167,137 +10142,56 @@ SENSOR</string>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>40</height>
+                      <height>16777215</height>
                      </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Adjust max velocity override</string>
-                    </property>
-                    <property name="maximum">
-                     <number>3600</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>10</number>
-                    </property>
-                    <property name="pageStep">
-                     <number>100</number>
-                    </property>
-                    <property name="value">
-                     <number>3600</number>
-                    </property>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="tickInterval">
-                     <number>10</number>
-                    </property>
-                    <property name="rapid_rate" stdset="0">
-                     <bool>false</bool>
                     </property>
                     <property name="max_velocity_rate" stdset="0">
                      <bool>true</bool>
                     </property>
+                    <property name="text_template" stdset="0">
+                     <string>MAX VELOCITY</string>
+                    </property>
+                    <property name="step_rate" stdset="0">
+                     <number>100</number>
+                    </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="btn_maxv_ovr_100">
+                   <widget class="QLineEdit" name="lbl_maxv">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>50</width>
-                      <height>0</height>
+                      <width>60</width>
+                      <height>30</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>50</width>
-                      <height>16777215</height>
+                      <width>60</width>
+                      <height>30</height>
                      </size>
                     </property>
-                    <property name="text">
-                     <string>100</string>
+                    <property name="toolTip">
+                     <string>Current maximum velocity</string>
                     </property>
-                    <property name="flat">
-                     <bool>false</bool>
+                    <property name="maxLength">
+                     <number>8</number>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                    <property name="placeholderText">
+                     <string>000</string>
                     </property>
                    </widget>
-                  </item>
-                  <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_33">
-                    <property name="spacing">
-                     <number>0</number>
-                    </property>
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="QLabel" name="label_28">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>MAXV</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="margin">
-                       <number>0</number>
-                      </property>
-                      <property name="indent">
-                       <number>-1</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="QLineEdit" name="lbl_maxv">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maxLength">
-                       <number>4</number>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
                   </item>
                  </layout>
                 </widget>
@@ -10307,229 +10201,7 @@ SENSOR</string>
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_36">
-                  <property name="spacing">
-                   <number>4</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="ActionButton" name="action_rapid_ovr_50">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Set rapid override to 50%</string>
-                    </property>
-                    <property name="text">
-                     <string>50</string>
-                    </property>
-                    <property name="flat">
-                     <bool>false</bool>
-                    </property>
-                    <property name="rapid_over_action" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                    <property name="float_num" stdset="0">
-                     <double>50.000000000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="StatusSlider" name="slider_rapid_ovr">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Adjust rapid rate override</string>
-                    </property>
-                    <property name="maximum">
-                     <number>100</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>1</number>
-                    </property>
-                    <property name="value">
-                     <number>100</number>
-                    </property>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="tickInterval">
-                     <number>10</number>
-                    </property>
-                    <property name="rapid_rate" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                    <property name="feed_rate" stdset="0">
-                     <bool>false</bool>
-                    </property>
-                    <property name="jograte_rate" stdset="0">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="ActionButton" name="action_rapid_ovr_100">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Set rapid override to 100%</string>
-                    </property>
-                    <property name="text">
-                     <string>100</string>
-                    </property>
-                    <property name="flat">
-                     <bool>false</bool>
-                    </property>
-                    <property name="rapid_over_action" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                    <property name="float_alt_num" stdset="0">
-                     <double>100.000000000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_36">
-                    <property name="spacing">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="label_32">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>RAPID</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="margin">
-                       <number>0</number>
-                      </property>
-                      <property name="indent">
-                       <number>-1</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="QLineEdit" name="lbl_max_rapid">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maxLength">
-                       <number>4</number>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_feed_ovr" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>50</height>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -10539,8 +10211,100 @@ SENSOR</string>
                   </size>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_21">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="StatusAdjustmentBar" name="adj_rapid_ovr">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="show_setting_menu" stdset="0">
+                     <bool>true</bool>
+                    </property>
+                    <property name="text_template" stdset="0">
+                     <string>RAPID RATE %s%%</string>
+                    </property>
+                    <property name="step_rate" stdset="0">
+                     <number>10</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lbl_max_rapid">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Current rapid rate</string>
+                    </property>
+                    <property name="maxLength">
+                     <number>8</number>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                    <property name="placeholderText">
+                     <string>000</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_feed_ovr" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
                   <property name="spacing">
-                   <number>4</number>
+                   <number>6</number>
                   </property>
                   <property name="leftMargin">
                    <number>0</number>
@@ -10555,50 +10319,7 @@ SENSOR</string>
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="ActionButton" name="action_feed_ovr_50">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Set feedrate override to 50%</string>
-                    </property>
-                    <property name="text">
-                     <string>50</string>
-                    </property>
-                    <property name="flat">
-                     <bool>false</bool>
-                    </property>
-                    <property name="feed_over_action" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                    <property name="float_num" stdset="0">
-                     <double>50.000000000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="StatusSlider" name="slider_feed_ovr">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
+                   <widget class="StatusAdjustmentBar" name="adj_feed_ovr">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -10608,162 +10329,69 @@ SENSOR</string>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Adjust feed rate override</string>
-                    </property>
-                    <property name="maximum">
-                     <number>120</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>1</number>
-                    </property>
-                    <property name="value">
-                     <number>100</number>
-                    </property>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="tickInterval">
-                     <number>10</number>
-                    </property>
-                    <property name="feed_rate" stdset="0">
-                     <bool>true</bool>
-                    </property>
-                    <property name="jograte_rate" stdset="0">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="ActionButton" name="action_feed_ovr_100">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
                       <height>16777215</height>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Set feedrate override to 100%</string>
+                     <string>Adjust feedrate override value</string>
                     </property>
-                    <property name="text">
-                     <string>100</string>
-                    </property>
-                    <property name="flat">
-                     <bool>false</bool>
-                    </property>
-                    <property name="feed_over_action" stdset="0">
+                    <property name="feed_rate" stdset="0">
                      <bool>true</bool>
                     </property>
-                    <property name="rapid_over_action" stdset="0">
-                     <bool>false</bool>
+                    <property name="show_setting_menu" stdset="0">
+                     <bool>true</bool>
                     </property>
-                    <property name="spindle_over_action" stdset="0">
-                     <bool>false</bool>
+                    <property name="text_template" stdset="0">
+                     <string>FEED RATE %s%%</string>
                     </property>
-                    <property name="float_num" stdset="0">
-                     <double>100.000000000000000</double>
-                    </property>
-                    <property name="float_alt_num" stdset="0">
-                     <double>100.000000000000000</double>
+                    <property name="step_rate" stdset="0">
+                     <number>10</number>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout">
-                    <item>
-                     <widget class="QLabel" name="label_36">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>FEED</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="margin">
-                       <number>0</number>
-                      </property>
-                      <property name="indent">
-                       <number>40</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="lbl_feed_ovr">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maxLength">
-                       <number>8</number>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                      <property name="placeholderText">
-                       <string>00%</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
+                   <widget class="StatusLabel" name="lbl_feed_ovr">
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::WinPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Sunken</enum>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="textTemplate" stdset="0">
+                     <string>%d</string>
+                    </property>
+                    <property name="alt_textTemplate" stdset="0">
+                     <string>%d</string>
+                    </property>
+                    <property name="current_feedrate_status" stdset="0">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="widget_jog_linear" native="true">
+                <widget class="QWidget" name="widget_linear_jog" native="true">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>50</height>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -10772,10 +10400,7 @@ SENSOR</string>
                    <height>50</height>
                   </size>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_55">
-                  <property name="spacing">
-                   <number>4</number>
-                  </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_28">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -10799,13 +10424,13 @@ SENSOR</string>
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
-                      <height>0</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>50</width>
-                      <height>16777215</height>
+                      <height>50</height>
                      </size>
                     </property>
                     <property name="toolTip">
@@ -10817,19 +10442,13 @@ SENSOR</string>
                     <property name="checkable">
                      <bool>true</bool>
                     </property>
-                    <property name="slider" stdset="0">
-                     <string>slider_jog_linear</string>
+                    <property name="adj" stdset="0">
+                     <string>adj_linear_jog</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="StatusSlider" name="slider_jog_linear">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
+                   <widget class="StatusAdjustmentBar" name="adj_linear_jog">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -10839,128 +10458,75 @@ SENSOR</string>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>40</height>
+                      <height>16777215</height>
                      </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Adjust linear jog rate</string>
-                    </property>
-                    <property name="maximum">
-                     <number>3600</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>100</number>
-                    </property>
-                    <property name="pageStep">
-                     <number>100</number>
-                    </property>
-                    <property name="value">
-                     <number>3000</number>
-                    </property>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="tickPosition">
-                     <enum>QSlider::NoTicks</enum>
-                    </property>
-                    <property name="tickInterval">
-                     <number>200</number>
                     </property>
                     <property name="jograte_rate" stdset="0">
                      <bool>true</bool>
                     </property>
+                    <property name="text_template" stdset="0">
+                     <string>LINEAR JOG</string>
+                    </property>
+                    <property name="step_rate" stdset="0">
+                     <number>100</number>
+                    </property>
                    </widget>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_4">
-                    <property name="spacing">
-                     <number>0</number>
+                   <widget class="StatusLabel" name="status_jog_linear">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
-                    <item>
-                     <widget class="QLabel" name="lbl_jog_linear">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>JOG-L</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="StatusLabel" name="status_jog_linear">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Linear jog rate</string>
-                      </property>
-                      <property name="frameShape">
-                       <enum>QFrame::WinPanel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Sunken</enum>
-                      </property>
-                      <property name="text">
-                       <string>200</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="textTemplate" stdset="0">
-                       <string>%d</string>
-                      </property>
-                      <property name="alt_textTemplate" stdset="0">
-                       <string>%d</string>
-                      </property>
-                      <property name="jograte_status" stdset="0">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Linear jog rate</string>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::WinPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Sunken</enum>
+                    </property>
+                    <property name="text">
+                     <string>200</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="textTemplate" stdset="0">
+                     <string>%d</string>
+                    </property>
+                    <property name="alt_textTemplate" stdset="0">
+                     <string>%d</string>
+                    </property>
+                    <property name="jograte_status" stdset="0">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="widget_jog_angular" native="true">
+                <widget class="QWidget" name="widget_angular_jog" native="true">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>50</height>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -10969,10 +10535,7 @@ SENSOR</string>
                    <height>50</height>
                   </size>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_59">
-                  <property name="spacing">
-                   <number>4</number>
-                  </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_31">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -10996,13 +10559,13 @@ SENSOR</string>
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
-                      <height>0</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>50</width>
-                      <height>16777215</height>
+                      <height>50</height>
                      </size>
                     </property>
                     <property name="toolTip">
@@ -11014,19 +10577,13 @@ SENSOR</string>
                     <property name="checkable">
                      <bool>true</bool>
                     </property>
-                    <property name="slider" stdset="0">
-                     <string>slider_jog_angular</string>
+                    <property name="adj" stdset="0">
+                     <string>adj_angular_jog</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="StatusSlider" name="slider_jog_angular">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
+                   <widget class="StatusAdjustmentBar" name="adj_angular_jog">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -11036,115 +10593,62 @@ SENSOR</string>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>40</height>
+                      <height>16777215</height>
                      </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Adjust angular jog rate</string>
-                    </property>
-                    <property name="maximum">
-                     <number>3600</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>100</number>
-                    </property>
-                    <property name="pageStep">
-                     <number>100</number>
-                    </property>
-                    <property name="value">
-                     <number>3000</number>
-                    </property>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="jograte_rate" stdset="0">
-                     <bool>false</bool>
                     </property>
                     <property name="jograte_angular_rate" stdset="0">
                      <bool>true</bool>
                     </property>
+                    <property name="text_template" stdset="0">
+                     <string>ANGULAR JOG</string>
+                    </property>
+                    <property name="step_rate" stdset="0">
+                     <number>100</number>
+                    </property>
                    </widget>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_38">
-                    <property name="spacing">
-                     <number>0</number>
+                   <widget class="StatusLabel" name="status_jog_angular">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
-                    <property name="leftMargin">
-                     <number>0</number>
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
                     </property>
-                    <item>
-                     <widget class="QLabel" name="lbl_jog_angular">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>JOG-A</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="StatusLabel" name="status_jog_angular">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>60</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>60</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Angular jog rate</string>
-                      </property>
-                      <property name="frameShape">
-                       <enum>QFrame::WinPanel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Sunken</enum>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <property name="textTemplate" stdset="0">
-                       <string>%d</string>
-                      </property>
-                      <property name="jograte_status" stdset="0">
-                       <bool>false</bool>
-                      </property>
-                      <property name="jograte_angular_status" stdset="0">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
+                    <property name="maximumSize">
+                     <size>
+                      <width>60</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Angular jog rate</string>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::WinPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Sunken</enum>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="textTemplate" stdset="0">
+                     <string>%d</string>
+                    </property>
+                    <property name="jograte_status" stdset="0">
+                     <bool>false</bool>
+                    </property>
+                    <property name="jograte_angular_status" stdset="0">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -12275,11 +11779,11 @@ OFF</string>
               </widget>
              </item>
              <item>
-              <widget class="QWidget" name="widget_spindle_ovr" native="true">
+              <widget class="StatusAdjustmentBar" name="adj_spindle_ovr">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>50</height>
+                 <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -12288,224 +11792,21 @@ OFF</string>
                  <height>50</height>
                 </size>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_57">
-                <property name="spacing">
-                 <number>4</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="ActionButton" name="action_spindle_ovr_50">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>50</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>50</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Set spindle override to 50%</string>
-                  </property>
-                  <property name="text">
-                   <string>50</string>
-                  </property>
-                  <property name="flat">
-                   <bool>false</bool>
-                  </property>
-                  <property name="spindle_over_action" stdset="0">
-                   <bool>true</bool>
-                  </property>
-                  <property name="float_num" stdset="0">
-                   <double>50.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="StatusSlider" name="slider_spindle_ovr">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>50</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>50</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Adjust spindle override</string>
-                  </property>
-                  <property name="minimum">
-                   <number>50</number>
-                  </property>
-                  <property name="maximum">
-                   <number>120</number>
-                  </property>
-                  <property name="singleStep">
-                   <number>1</number>
-                  </property>
-                  <property name="value">
-                   <number>100</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="tickPosition">
-                   <enum>QSlider::NoTicks</enum>
-                  </property>
-                  <property name="tickInterval">
-                   <number>10</number>
-                  </property>
-                  <property name="rapid_rate" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="feed_rate" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="spindle_rate" stdset="0">
-                   <bool>true</bool>
-                  </property>
-                  <property name="jograte_rate" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="ActionButton" name="action_spindle_ovr_100">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>50</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>50</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Set spindle override to 100%</string>
-                  </property>
-                  <property name="text">
-                   <string>100</string>
-                  </property>
-                  <property name="flat">
-                   <bool>false</bool>
-                  </property>
-                  <property name="rapid_over_action" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <property name="spindle_over_action" stdset="0">
-                   <bool>true</bool>
-                  </property>
-                  <property name="float_alt_num" stdset="0">
-                   <double>100.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <item>
-                   <widget class="QLabel" name="label_37">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>24</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>OVR</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                    <property name="margin">
-                     <number>0</number>
-                    </property>
-                    <property name="indent">
-                     <number>0</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lbl_spindle_ovr">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>24</height>
-                     </size>
-                    </property>
-                    <property name="maxLength">
-                     <number>8</number>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                    <property name="placeholderText">
-                     <string>00%</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
+               <property name="toolTip">
+                <string>Adjust spindle override</string>
+               </property>
+               <property name="spindle_rate" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="show_setting_menu" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="text_template" stdset="0">
+                <string>SPINDLE  %s%%</string>
+               </property>
+               <property name="step_rate" stdset="0">
+                <number>10</number>
+               </property>
               </widget>
              </item>
             </layout>
@@ -12663,9 +11964,9 @@ OFF</string>
    <header>qtvcp.widgets.status_label</header>
   </customwidget>
   <customwidget>
-   <class>StatusSlider</class>
-   <extends>QSlider</extends>
-   <header>qtvcp.widgets.status_slider</header>
+   <class>StatusAdjustmentBar</class>
+   <extends>QWidget</extends>
+   <header>qtvcp.widgets.adjustment_bar</header>
   </customwidget>
   <customwidget>
    <class>ScreenOptions</class>
@@ -12760,8 +12061,8 @@ OFF</string>
   <slot>chk_enable_spindle_changed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="mode_buttonGroup"/>
   <buttongroup name="page_buttonGroup"/>
   <buttongroup name="scale_buttonGroup"/>
+  <buttongroup name="mode_buttonGroup"/>
  </buttongroups>
 </ui>

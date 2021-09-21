@@ -24,11 +24,8 @@ class Connections():
         self.w.btn_load_tool.clicked.connect(self.parent.btn_load_tool_clicked)
         self.w.btn_tool_sensor.clicked.connect(self.parent.btn_touchoff_clicked)
         self.w.btn_touchplate.clicked.connect(self.parent.btn_touchoff_clicked)
-        self.w.btn_maxv_ovr_50.clicked.connect(self.parent.btn_maxv_50_clicked)
-        self.w.btn_maxv_ovr_100.clicked.connect(self.parent.btn_maxv_100_clicked)
         self.w.btn_dimensions.clicked.connect(lambda state: self.parent.btn_dimensions_clicked(state))
         self.w.btn_alpha_mode.clicked.connect(lambda state: self.parent.alpha_mode_clicked(state))
-        # action buttons
         # checkboxes
         self.w.chk_use_mpg.stateChanged.connect(lambda state: self.parent.chk_use_mpg_changed(state))
         self.w.chk_override_limits.stateChanged.connect(lambda state: self.parent.chk_override_limits_changed(state))
@@ -40,11 +37,12 @@ class Connections():
         self.w.chk_lock_tsh.stateChanged.connect(lambda state: self.w.lineEdit_sensor_height.setReadOnly(not state))
         self.w.chk_lock_tph.stateChanged.connect(lambda state: self.w.lineEdit_touch_height.setReadOnly(not state))
         self.w.chk_lock_wph.stateChanged.connect(lambda state: self.w.lineEdit_work_height.setReadOnly(not state))
+        # adjustment bars
+        self.w.adj_feed_ovr.valueChanged.connect(lambda value: self.parent.adj_feed_ovr_changed(value))
+        self.w.adj_spindle_ovr.valueChanged.connect(lambda value: self.parent.adj_spindle_ovr_changed(value))
+        self.w.adj_rapid_ovr.valueChanged.connect(lambda value: self.parent.adj_rapid_changed(value))
+        self.w.adj_maxv_ovr.valueChanged.connect(lambda value: self.parent.adj_maxv_changed(value))
         # sliders
-        self.w.slider_feed_ovr.valueChanged.connect(lambda value: self.parent.slider_feed_ovr_changed(value))
-        self.w.slider_spindle_ovr.valueChanged.connect(lambda value: self.parent.slider_spindle_ovr_changed(value))
-        self.w.slider_rapid_ovr.valueChanged.connect(lambda value: self.parent.slider_rapid_changed(value))
-        self.w.slider_maxv_ovr.valueChanged.connect(lambda value: self.parent.slider_maxv_changed(value))
         self.w.cam_diameter.valueChanged.connect(lambda value: self.parent.cam_dia_changed(value))
         self.w.cam_rotate.valueChanged.connect(lambda value: self.parent.cam_rot_changed(value))
         # comboboxes

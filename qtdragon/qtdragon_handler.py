@@ -55,9 +55,9 @@ class HandlerClass:
         self.probe = None
         self.pause_dialog = None
         self.progress = None
-        self.run_color = 'green'
-        self.stop_color = 'red'
-        self.pause_color = 'yellow'
+        self.run_color = QtGui.QColor('green')
+        self.stop_color = QtGui.QColor('red')
+        self.pause_color = QtGui.QColor('yellow')
         self.default_setup = os.path.join(PATH.CONFIGPATH, "default_setup.html")
         self.start_line = 0
         self.run_time = 0
@@ -86,7 +86,7 @@ class HandlerClass:
 
         self.onoff_list = ["program", "tool", "touchoff", "dro", "overrides", "feedrate", "spindle"]
 
-        self.axis_a_list = ["widget_jog_angular", "widget_increments_angular", "dro_axis_a",
+        self.axis_a_list = ["widget_angular_jog", "widget_increments_angular", "dro_axis_a",
                             "axistoolbutton_a", "btn_zero_a", "btn_goto_zero_a"]
 
         STATUS.connect('general', self.dialog_return)
@@ -131,8 +131,6 @@ class HandlerClass:
         self.chk_use_mpg_changed(self.w.chk_use_mpg.isChecked())
         self.chk_run_from_line_changed(self.w.chk_run_from_line.isChecked())
         self.chk_use_camera_changed(self.w.chk_use_camera.isChecked())
-        self.slider_spindle_ovr_changed(self.w.slider_spindle_ovr.value())
-        self.slider_feed_ovr_changed(self.w.slider_feed_ovr.value())
         # hide widgets for A axis if not present
         if "A" not in self.axis_list:
             for i in self.axis_a_list:
@@ -245,23 +243,17 @@ class HandlerClass:
 
     def init_widgets(self):
         self.w.main_tab_widget.setCurrentIndex(0)
-        self.w.slider_jog_linear.setMaximum(INFO.MAX_LINEAR_JOG_VEL)
-        self.w.slider_jog_linear.setValue(INFO.DEFAULT_LINEAR_JOG_VEL)
-        self.w.slider_jog_angular.setMaximum(INFO.MAX_ANGULAR_JOG_VEL)
-        self.w.slider_jog_angular.setValue(INFO.DEFAULT_ANGULAR_JOG_VEL)
-        self.w.slider_feed_ovr.setMaximum(INFO.MAX_FEED_OVERRIDE)
-        self.w.slider_feed_ovr.setValue(100)
-        self.w.slider_spindle_ovr.setMinimum(INFO.MIN_SPINDLE_OVERRIDE)
-        self.w.slider_spindle_ovr.setMaximum(INFO.MAX_SPINDLE_OVERRIDE)
-        self.w.slider_spindle_ovr.setValue(100)
+        self.w.adj_angular_jog.setValue(INFO.DEFAULT_ANGULAR_JOG_VEL)
+        self.w.adj_spindle_ovr.setValue(100)
         self.w.chk_override_limits.setChecked(False)
         self.w.chk_override_limits.setEnabled(False)
-        self.w.lbl_max_rapid.setText("{:4.0f}".format(self.max_linear_velocity))
-        self.w.lbl_maxv.setText("{:4.0f}".format(self.max_linear_velocity))
         self.w.lbl_home_x.setText(INFO.get_error_safe_setting('JOINT_0', 'HOME',"50"))
         self.w.lbl_home_y.setText(INFO.get_error_safe_setting('JOINT_1', 'HOME',"50"))
         self.w.cmb_gcode_history.addItem("No File Loaded")
         self.w.cmb_gcode_history.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        # set calculator mode for menu buttons
+        for i in ("x", "y", "z", "a"):
+            self.w["axistoolbutton_" + i].set_dialog_code('CALCULATOR')
         # disable mouse wheel events on comboboxes
         self.w.cmb_gcode_history.wheelEvent = lambda event: None
         self.w.cmb_stylesheet.wheelEvent = lambda event: None
@@ -475,18 +467,14 @@ class HandlerClass:
             self.w['lbl_' + i].setText(unit + "/MIN")
         unit = "M/MIN" if mode else "F/MIN"
         self.w.lbl_scs_units.setText(unit)
-        if INFO.MACHINE_IS_METRIC == mode:
+        if mode == INFO.MACHINE_IS_METRIC:
             self.factor = 1.0
-            rapid = (float(self.w.slider_rapid_ovr.value()) / 100) * self.max_linear_velocity
-            maxv = float(self.w.slider_maxv_ovr.value())
         elif mode:
             self.factor = 25.4
-            rapid = (float(self.w.slider_rapid_ovr.value()) / 100) * self.max_linear_velocity * 25.4
-            maxv = float(self.w.slider_maxv_ovr.value()) * 25.4
         else:
             self.factor = 1/25.4
-            rapid = (float(self.w.slider_rapid_ovr.value()) / 100) * self.max_linear_velocity / 25.4
-            maxv = float(self.w.slider_maxv_ovr.value()) / 25.4
+        maxv = self.w.adj_maxv_ovr.value * self.factor
+        rapid = (self.w.adj_rapid_ovr.value / 100) * self.max_linear_velocity * self.factor
         self.w.lbl_max_rapid.setText("{:4.0f}".format(rapid))
         self.w.lbl_maxv.setText("{:4.0f}".format(maxv))
 
@@ -796,43 +784,42 @@ class HandlerClass:
 
     # override frame
     def slow_button_clicked(self, state):
-        slider = self.w.sender().property('slider')
-        current = self.w[slider].value()
-        max = self.w[slider].maximum()
+        adj = self.w.sender().property('adj')
         if state:
             self.w.sender().setText("SLOW")
-            self.w[slider].setMaximum(max / self.slow_jog_factor)
-            self.w[slider].setValue(current / self.slow_jog_factor)
-            self.w[slider].setPageStep(10)
+            value = int(self.w[adj].value / self.slow_jog_factor)
+            maxval = int(self.w[adj].maximum() / self.slow_jog_factor)
+            hival = int(self.w[adj].hi_value / self.slow_jog_factor)
+            lowval = int(self.w[adj].low_value / self.slow_jog_factor)
+            step = 10
         else:
             self.w.sender().setText("FAST")
-            self.w[slider].setMaximum(max * self.slow_jog_factor)
-            self.w[slider].setValue(current * self.slow_jog_factor)
-            self.w[slider].setPageStep(100)
+            value = int(self.w[adj].value * self.slow_jog_factor)
+            maxval = int(self.w[adj].maximum() * self.slow_jog_factor)
+            hival = int(self.w[adj].hi_value * self.slow_jog_factor)
+            lowval = int(self.w[adj].low_value * self.slow_jog_factor)
+            step = 100
+        self.w[adj].low_value = lowval
+        self.w[adj].hi_value = hival
+        self.w[adj].setMaximum(maxval)
+        self.w[adj].setValue(value)
+        self.w[adj].setStep(step)
+        self.w[adj].valueChanged.emit(value)
 
-    def slider_rapid_changed(self, value):
-        rapid = (float(value) / 100) * self.max_linear_velocity * self.factor
+    def adj_rapid_changed(self, value):
+        rapid = (value / 100) * self.max_linear_velocity * self.factor
         self.w.lbl_max_rapid.setText("{:4.0f}".format(rapid))
 
-    def slider_maxv_changed(self, value):
-        maxv = (float(value) / 3600) * self.max_linear_velocity * self.factor
-        self.w.lbl_maxv.setText("{:4.0f}".format(maxv))
+    def adj_maxv_changed(self, value):
+        self.w.lbl_maxv.setText("{:4.0f}".format(value * self.factor))
 
-    def slider_feed_ovr_changed(self, value):
+    def adj_feed_ovr_changed(self, value):
         frac = int(value * self.max_linear_velocity / 100)
         self.w.gauge_feedrate.set_threshold(frac)
-        self.w.lbl_feed_ovr.setText("{}%".format(value))
 
-    def slider_spindle_ovr_changed(self, value):
+    def adj_spindle_ovr_changed(self, value):
         frac = int(value * self.max_spindle_rpm / 100)
         self.w.gauge_spindle.set_threshold(frac)
-        self.w.lbl_spindle_ovr.setText("{}%".format(value))
-
-    def btn_maxv_100_clicked(self):
-        self.w.slider_maxv_ovr.setValue(self.max_linear_velocity)
-
-    def btn_maxv_50_clicked(self):
-        self.w.slider_maxv_ovr.setValue(self.max_linear_velocity / 2)
 
     # file tab
     def btn_gcode_edit_clicked(self, state):

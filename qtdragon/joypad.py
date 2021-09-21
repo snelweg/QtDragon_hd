@@ -1,4 +1,18 @@
 #!/usr/bin/python
+# Qtvcp Joypad widget
+#
+# Copyright (c) 2021  Jim Sloot <persei802@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+###############################################################################
 import sys
 import hal
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -17,7 +31,7 @@ class JoyPad(QtWidgets.QWidget):
         self.top_image = None
         self.bottom_image = None
         self.center_image = None
-        self.highlight_color = 'gray'
+        self.highlight_color = QColor('gray')
         self.highlight_left = False
         self.highlight_right = False
         self.highlight_top = False
@@ -165,7 +179,7 @@ class JoyPad(QtWidgets.QWidget):
         center = event.rect().center()
         rect.moveCenter(center)
         pen_width = self.rect1.width() * 0.08
-        qp.setPen(QPen(QColor(self.highlight_color), pen_width, cap = Qt.FlatCap))
+        qp.setPen(QPen(self.highlight_color, pen_width, cap = Qt.FlatCap))
         if self.highlight_right is True:
             qp.drawArc(rect, -45 * 16, 90 * 16)
         if self.highlight_left is True:
@@ -204,7 +218,7 @@ class JoyPad(QtWidgets.QWidget):
         if btn in self.btn_names.keys():
             self.tooltips[btn] = tip
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.pyqtSlot(QColor)
     def set_highlight_color(self, color):
         self.highlight_color = color
         self.update()
@@ -213,9 +227,9 @@ class JoyPad(QtWidgets.QWidget):
         return self.highlight_color
 
     def reset_highlight_color(self):
-        self.highlight_color = 'gray'
+        self.highlight_color = QColor('gray')
 
-    HighlightColor = QtCore.pyqtProperty(str, get_highlight_color, set_highlight_color, reset_highlight_color)
+    HighlightColor = QtCore.pyqtProperty(QColor, get_highlight_color, set_highlight_color, reset_highlight_color)
 
     @QtCore.pyqtSlot(str)
     def btn_clicked(self, btn):
@@ -225,6 +239,7 @@ class JoyPad(QtWidgets.QWidget):
     def btn_released(self, btn):
         print("Button released", btn)
 
+    # required code for object indexing
     def __getitem__(self, item):
         return getattr(self, item)
 
