@@ -53,6 +53,9 @@ class HandlerClass:
         # some global variables
         self.factor = 1.0
         self.probe = None
+        self.jog_az = JoyPad()
+        self.jog_xy = JoyPad()
+        self.pgm_control = JoyPad()
         self.pause_dialog = None
         self.progress = None
         self.run_color = QtGui.QColor('green')
@@ -316,7 +319,6 @@ class HandlerClass:
 
     def init_joypads(self):
         # jog A and Z
-        self.jog_az = JoyPad()
         self.w.layout_jog_buttons.addWidget(self.jog_az)
         if 'A' in self.axis_list:
             self.jog_az.set_icon('L', 'text', 'A-')
@@ -327,7 +329,6 @@ class HandlerClass:
         self.jog_az.joy_btn_clicked.connect(self.jog_az_clicked)
         self.jog_az.joy_btn_released.connect(self.jog_az_released)
         # jog X and Y
-        self.jog_xy = JoyPad()
         self.w.layout_jog_buttons.addWidget(self.jog_xy)
         if 'X' in self.axis_list:
             self.jog_xy.set_icon('L', 'text', 'X-')
@@ -338,7 +339,6 @@ class HandlerClass:
         self.jog_xy.joy_btn_clicked.connect(self.jog_xy_clicked)
         self.jog_xy.joy_btn_released.connect(self.jog_xy_released)
         # program controls
-        self.pgm_control = JoyPad()
         self.w.layout_program_control.addWidget(self.pgm_control)
         self.pgm_control.set_tooltip('T', "RUN")
         self.pgm_control.set_tooltip('L', "RELOAD")
