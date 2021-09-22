@@ -46,8 +46,7 @@ class JoyPad(QtWidgets.QWidget):
         self.axis_list = ('X', 'Y', 'Z', 'A')
 
     def eventFilter(self, obj, event):
-        if obj is self:
-            if not self.isEnabled(): return super().eventFilter(obj, event)
+        if obj is self and self.isEnabled():
             if event.type() == QEvent.MouseButtonPress:
                 if event.button() == Qt.RightButton:
                     event.ignore()
@@ -67,7 +66,7 @@ class JoyPad(QtWidgets.QWidget):
                 active_btn = self.get_active_btn(pos)
                 if active_btn is not None:
                     self.setToolTip(self.tooltips[active_btn])
-        return super().eventFilter(obj, event)
+        return super(JoyPad, self).eventFilter(obj, event)
 
     def get_active_btn(self, pos):
         if self.center_path.contains(pos): return 'C'
