@@ -281,7 +281,9 @@ class HandlerClass:
         # initialize gauges
         self.w.gauge_feedrate._value_font_size = 12
         self.w.gauge_feedrate._label_font_size = 8
+        self.w.gauge_feedrate.set_threshold(self.max_linear_velocity)
         self.w.gauge_spindle._value_font_size = 12
+        self.w.gauge_spindle.set_threshold(self.max_spindle_rpm)
         # apply standard button icons
         for key in self.icon_btns:
             style = self.w[key].style()
@@ -750,15 +752,18 @@ class HandlerClass:
         ACTION.CALL_MDI_WAIT(command,10)
 
     def btn_ref_laser_clicked(self):
-        x = float(self.w.lineEdit_laser_x.text())
-        y = float(self.w.lineEdit_laser_y.text())
-        if not STATUS.is_metric_mode():
-            x = x / 25.4
-            y = y / 25.4
-        self.add_status("Laser offsets set")
-        command = "G10 L20 P0 X{:3.4f} Y{:3.4f}".format(x, y)
-        ACTION.CALL_MDI(command)
-    
+        if self.w.btn_laser_on.isChecked():
+            x = float(self.w.lineEdit_laser_x.text())
+            y = float(self.w.lineEdit_laser_y.text())
+            if not STATUS.is_metric_mode():
+                x = x / 25.4
+                y = y / 25.4
+            self.add_status("Laser offsets set")
+            command = "G10 L20 P0 X{:3.4f} Y{:3.4f}".format(x, y)
+            ACTION.CALL_MDI(command)
+        else:
+            self.add_status("Laser must be on to set laser offset")
+
     def btn_touchoff_clicked(self):
         if STATUS.get_current_tool() == 0:
             self.add_status("Cannot touchoff with no tool loaded")
@@ -879,11 +884,14 @@ class HandlerClass:
     def btn_clear_status_clicked(self):
         STATUS.emit('update-machine-log', None, 'DELETE')
 
-    def btn_save_status_clicked(self):
-        text = self.w.machinelog.toPlainText()
+    def btn_save_log_clicked(self):
+        if self.w.btn_select_log.isChecked():
+            text = self.w.integrator_log.toPlainText()
+        else:
+            text = self.w.machinelog.toPlainText()
         filename = self.w.lbl_clock.text()
         filename = 'status_' + filename.replace(' ','_') + '.txt'
-        self.add_status("Saving Status file to {}".format(filename))
+        self.add_status("Saving log to {}".format(filename))
         with open(filename, 'w') as f:
             f.write(text)
 

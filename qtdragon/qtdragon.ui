@@ -901,7 +901,7 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>5</number>
                </property>
                <widget class="QWidget" name="main_tab_widgetPage1">
                 <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
@@ -2836,7 +2836,7 @@ GCODE</string>
 ROTATION</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="zero_zrot_action" stdset="0">
                        <bool>true</bool>
@@ -2868,7 +2868,7 @@ ROTATION</string>
 G92</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="zero_g92_action" stdset="0">
                        <bool>true</bool>
@@ -2939,7 +2939,7 @@ G92</string>
 G5X</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="zero_g5x_action" stdset="0">
                        <bool>true</bool>
@@ -3381,12 +3381,12 @@ LOG</string>
 STATUS</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="btn_save_status">
+                     <widget class="QPushButton" name="btn_save_log">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -3413,7 +3413,7 @@ STATUS</string>
 TO FILE</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
@@ -5554,7 +5554,7 @@ CAMERA</string>
                        <number>2</number>
                       </property>
                       <property name="text">
-                       <string>12:39:14 PM</string>
+                       <string>09:15:37 PM</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
@@ -5677,7 +5677,7 @@ CAMERA</string>
                        <string>STATUS</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="launch_status_action" stdset="0">
                        <bool>true</bool>
@@ -5750,7 +5750,7 @@ CAMERA</string>
                        <string>HAL SCOPE</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="launch_halscope_action" stdset="0">
                        <bool>true</bool>
@@ -5823,7 +5823,7 @@ CAMERA</string>
                        <string>HAL METER</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="launch_halmeter_action" stdset="0">
                        <bool>true</bool>
@@ -5896,7 +5896,7 @@ CAMERA</string>
                        <string>HAL SHOW</string>
                       </property>
                       <property name="flat">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                       <property name="launch_halshow_action" stdset="0">
                        <bool>true</bool>
@@ -12061,8 +12061,8 @@ OFF</string>
   <slot>chk_enable_spindle_changed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="page_buttonGroup"/>
-  <buttongroup name="scale_buttonGroup"/>
   <buttongroup name="mode_buttonGroup"/>
+  <buttongroup name="scale_buttonGroup"/>
+  <buttongroup name="page_buttonGroup"/>
  </buttongroups>
 </ui>

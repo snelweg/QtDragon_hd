@@ -11,7 +11,7 @@ class Connections():
         self.w.btn_gcode_edit.clicked.connect(self.parent.btn_gcode_edit_clicked)
         self.w.btn_copy_right.clicked.connect(self.parent.btn_copy_file_clicked)
         self.w.btn_copy_left.clicked.connect(self.parent.btn_copy_file_clicked)
-        self.w.btn_save_status.clicked.connect(self.parent.btn_save_status_clicked)
+        self.w.btn_save_log.clicked.connect(self.parent.btn_save_log_clicked)
         self.w.btn_clear_status.clicked.connect(self.parent.btn_clear_status_clicked)
         self.w.btn_home_all.clicked.connect(self.parent.btn_home_all_clicked)
         self.w.btn_ref_laser.clicked.connect(self.parent.btn_ref_laser_clicked)
