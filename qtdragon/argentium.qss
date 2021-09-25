@@ -99,7 +99,6 @@ QComboBox::drop-down {
 
 QComboBox::item {
     background-color: #303030;
-    font: 10pt "Lato Heavy";
     color: #e0e0e0;
 }
 
