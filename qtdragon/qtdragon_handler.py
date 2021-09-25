@@ -6,7 +6,8 @@ from joypad import JoyPad
 from facing import Facing
 from hole_circle import Hole_Circle
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
-from PyQt5.QtWebKitWidgets import QWebView, QWebPage
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebEngineWidgets import QWebEnginePage
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
 from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_TABLE
@@ -38,6 +39,13 @@ TAB_GCODES = 7
 TAB_SETUP = 8
 TAB_UTILS = 9
 TAB_SETTINGS = 10
+
+# this class provides an overloaded function to disable navigation links
+class WebPage(QWebEnginePage):
+    def acceptNavigationRequest(self, url, navtype, mainframe):
+        if navtype == self.NavigationTypeLinkClicked: return False
+        return super().acceptNavigationRequest(url, navtype, mainframe)
+
 
 class HandlerClass:
     def __init__(self, halcomp, widgets, paths):
@@ -143,7 +151,8 @@ class HandlerClass:
             self.w['lineEdit_' + val].setValidator(self.valid)
         # check for default setup html file
         try:
-            self.web_page.mainFrame().load(QtCore.QUrl.fromLocalFile(self.default_setup))
+            url = QtCore.QUrl("file:///" + self.default_setup)
+            self.web_view.load(url)
         except Exception as e:
             print("No default setup file found - {}".format(e))
         # set unit labels according to machine mode
@@ -273,9 +282,8 @@ class HandlerClass:
         #set up gcode list
         self.gcodes.setup_list()
         # set up web page viewer
-        self.web_view = QWebView()
-        self.web_page = QWebPage()
-        self.web_page.setLinkDelegationPolicy(QWebPage.DelegateAllLinks)
+        self.web_view = QWebEngineView()
+        self.web_page = WebPage()
         self.web_view.setPage(self.web_page)
         self.w.layout_setup.addWidget(self.web_view)
         # initialize gauges
@@ -972,7 +980,8 @@ class HandlerClass:
             self.w.main_tab_widget.setCurrentIndex(TAB_MAIN)
         elif fname.endswith(".html"):
             try:
-                self.web_page.mainFrame().load(QtCore.QUrl.fromLocalFile(fname))
+                url = QtCore.QUrl("file:///" + fname)
+                self.web_view.load(url)
                 self.add_status("Loaded HTML file : {}".format(fname))
                 self.w.main_tab_widget.setCurrentIndex(TAB_SETUP)
                 self.w.btn_setup.setChecked(True)
