@@ -1,3 +1,6 @@
+@settings {
+  font-size: 30;
+}
 # QtDragon_hd
 # Requires an extra library QtWebEngine for displaying job setup sheets formatted in HTML
 # sudo apt-get install python3-pyqt5.qtwebengine
