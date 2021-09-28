@@ -26,6 +26,7 @@ class Connections():
         self.w.btn_touchplate.clicked.connect(self.parent.btn_touchoff_clicked)
         self.w.btn_dimensions.clicked.connect(lambda state: self.parent.btn_dimensions_clicked(state))
         self.w.btn_alpha_mode.clicked.connect(lambda state: self.parent.alpha_mode_clicked(state))
+        self.w.btn_clear_mdi.clicked.connect(self.parent.btn_clear_mdi_clicked)
         # checkboxes
         self.w.chk_use_mpg.stateChanged.connect(lambda state: self.parent.chk_use_mpg_changed(state))
         self.w.chk_override_limits.stateChanged.connect(lambda state: self.parent.chk_override_limits_changed(state))
