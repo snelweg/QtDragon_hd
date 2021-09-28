@@ -26,6 +26,7 @@ STATUS = Status()
 INFO = Info()
 ACTION = Action()
 PATH = Path()
+SUBPROGRAM = os.path.join(PATH.CONFIGPATH, 'qtdragon/touchoff_subprog.py')
 
 # constants for tab pages
 TAB_MAIN = 0
@@ -59,13 +60,14 @@ class HandlerClass:
         KEYBIND.add_call('Key_Pause', 'on_keycall_PAUSE')
         KEYBIND.add_call('Key_Any', 'on_keycall_PAUSE')
         # some global variables
-        self.factor = 1.0
+        self.proc = None
         self.probe = None
+        self.progress = None
+        self.pause_dialog = None
+        self.factor = 1.0
         self.jog_az = JoyPad()
         self.jog_xy = JoyPad()
         self.pgm_control = JoyPad()
-        self.pause_dialog = None
-        self.progress = None
         self.run_color = QtGui.QColor('green')
         self.stop_color = QtGui.QColor('red')
         self.pause_color = QtGui.QColor('yellow')
@@ -848,7 +850,6 @@ class HandlerClass:
             self.w.gcode_editor.readOnlyMode()
 
     def btn_load_file_clicked(self):
-        print("Button load file clicked")
         if self.w.btn_gcode_edit.isChecked(): return
         fname = self.w.filemanager.getCurrentSelected()
         if fname[1] is True:
@@ -996,9 +997,10 @@ class HandlerClass:
 
     def touchoff(self, selector):
         if selector == 'touchplate':
-            z_offset = float(self.w.lineEdit_touch_height.text())
+            z_offset = self.w.lineEdit_touch_height.text()
         elif selector == 'toolsensor':
             z_offset = float(self.w.lineEdit_sensor_height.text()) - float(self.w.lineEdit_work_height.text())
+            z_offset = str(z_offset)
         else:
             self.add_status("Unknown touchoff routine specified")
             return
@@ -1006,26 +1008,9 @@ class HandlerClass:
         max_probe = self.w.lineEdit_max_probe.text()
         search_vel = self.w.lineEdit_search_vel.text()
         probe_vel = self.w.lineEdit_probe_vel.text()
-        ACTION.CALL_MDI("G21 G49")
-        ACTION.CALL_MDI("G10 L20 P0 Z0")
-        ACTION.CALL_MDI("G91")
-        command = "G38.2 Z-{} F{}".format(max_probe, search_vel)
-        if ACTION.CALL_MDI_WAIT(command, 10) == -1:
-            ACTION.CALL_MDI("G90")
-            return
-        if ACTION.CALL_MDI_WAIT("G1 Z4.0"):
-            ACTION.CALL_MDI("G90")
-            return
-        ACTION.CALL_MDI("G4 P0.5")
-        command = "G38.2 Z-4.4 F{}".format(probe_vel)
-        if ACTION.CALL_MDI_WAIT(command, 10) == -1:
-            ACTION.CALL_MDI("G90")
-            return
-        command = "G10 L20 P0 Z{}".format(z_offset)
-        ACTION.CALL_MDI_WAIT(command)
-        command = "G1 Z10 F{}".format(search_vel)
-        ACTION.CALL_MDI_WAIT(command)
-        ACTION.CALL_MDI("G90")
+        self.start_touchoff()
+        string_to_send = "probe_down$" + search_vel + "$" + probe_vel + "$" + max_probe + "$" + z_offset + "\n"
+        self.proc.writeData(bytes(string_to_send, 'utf-8'))
 
     def kb_jog(self, state, joint, direction, fast = False, linear = True):
         if not STATUS.is_man_mode() or not STATUS.machine_is_on():
@@ -1081,7 +1066,43 @@ class HandlerClass:
         if self.timer_on:
             self.timer_on = False
             self.add_status("Run timer stopped at {}".format(self.w.lbl_runtime.text()))
-        
+
+    def start_touchoff(self):
+        if self.proc is not None:
+            self.add_status("Touchoff routine is already running")
+            return
+        self.proc = QtCore.QProcess()
+        self.proc.setReadChannel(QtCore.QProcess.StandardOutput)
+        self.proc.started.connect(self.touchoff_started)
+        self.proc.readyReadStandardOutput.connect(self.read_stdout)
+        self.proc.readyReadStandardError.connect(self.read_stderror)
+        self.proc.finished.connect(self.touchoff_finished)
+        self.proc.start('python3 {}'.format(SUBPROGRAM))
+
+    def read_stdout(self):
+        qba = self.proc.readAllStandardOutput()
+        line = qba.data()
+        self.parse_line(line)
+
+    def read_stderror(self):
+        qba = self.proc.readAllStandardError()
+        line = qba.data()
+        self.parse_line(line)
+
+    def parse_line(self, line):
+        line = line.decode("utf-8")
+        if "COMPLETE" in line:
+            self.add_status("Touchoff routine returned success")
+        elif "ERROR" in line:
+            self.add_status(line)
+
+    def touchoff_started(self):
+        LOG.info("TouchOff subprogram started with PID {}\n".format(self.proc.processId()))
+
+    def touchoff_finished(self, exitCode, exitStatus):
+        LOG.info("Touchoff Process finished - exitCode {} exitStatus {}".format(exitCode, exitStatus))
+        self.proc = None
+
     #####################
     # KEY BINDING CALLS #
     #####################
