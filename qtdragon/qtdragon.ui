@@ -771,70 +771,94 @@
               </widget>
              </item>
              <item>
-              <widget class="GcodeEditor" name="gcode_viewer">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+              <widget class="QStackedWidget" name="stackedWidget_gcode">
+               <property name="currentIndex">
+                <number>1</number>
                </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Lato</family>
-                 <pointsize>10</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="auto_show_mdi_status" stdset="0">
-                <bool>true</bool>
-               </property>
-               <property name="auto_show_manual_status" stdset="0">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="MDILine" name="mdiline">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maxLength">
-                <number>60</number>
-               </property>
-               <property name="placeholderText">
-                <string>MDI:</string>
-               </property>
-               <property name="soft_keyboard_option" stdset="0">
-                <bool>false</bool>
-               </property>
+               <widget class="QWidget" name="gcode">
+                <layout class="QVBoxLayout" name="verticalLayout">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="GcodeEditor" name="gcode_viewer">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Lato</family>
+                     <pointsize>10</pointsize>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="auto_show_mdi_status" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                   <property name="auto_show_manual_status" stdset="0">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="mdi_history">
+                <layout class="QVBoxLayout" name="verticalLayout_3">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="MDIHistory" name="mdihistory">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </item>
             </layout>
@@ -901,7 +925,7 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <property name="currentIndex">
-                <number>5</number>
+                <number>10</number>
                </property>
                <widget class="QWidget" name="main_tab_widgetPage1">
                 <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
@@ -1959,19 +1983,19 @@ GCODE</string>
                       <property name="cornerButtonEnabled">
                        <bool>false</bool>
                       </property>
-                      <attribute name="horizontalHeaderDefaultSectionSize">
+                      <attribute name="horizontalHeaderMinimumSectionSize">
                        <number>80</number>
                       </attribute>
-                      <attribute name="horizontalHeaderMinimumSectionSize">
+                      <attribute name="horizontalHeaderDefaultSectionSize">
                        <number>80</number>
                       </attribute>
                       <attribute name="verticalHeaderCascadingSectionResizes">
                        <bool>false</bool>
                       </attribute>
-                      <attribute name="verticalHeaderDefaultSectionSize">
+                      <attribute name="verticalHeaderMinimumSectionSize">
                        <number>30</number>
                       </attribute>
-                      <attribute name="verticalHeaderMinimumSectionSize">
+                      <attribute name="verticalHeaderDefaultSectionSize">
                        <number>30</number>
                       </attribute>
                      </widget>
@@ -5554,7 +5578,7 @@ CAMERA</string>
                        <number>2</number>
                       </property>
                       <property name="text">
-                       <string>09:15:37 PM</string>
+                       <string>10:06:31 AM</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
@@ -5611,33 +5635,29 @@ CAMERA</string>
                      <number>4</number>
                     </property>
                     <item>
-                     <widget class="QWidget" name="widget_mb_errors" native="true">
-                      <layout class="QVBoxLayout" name="verticalLayout_37">
-                       <property name="spacing">
-                        <number>4</number>
-                       </property>
-                       <property name="leftMargin">
-                        <number>2</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>2</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>2</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>2</number>
-                       </property>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QWidget" name="widget_modbus_fault" native="true">
-                      <layout class="QVBoxLayout" name="verticalLayout_34">
-                       <property name="spacing">
-                        <number>0</number>
-                       </property>
-                      </layout>
+                     <widget class="QPushButton" name="btn_clear_mdi">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>90</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>90</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>CLEAR
+MDI</string>
+                      </property>
                      </widget>
                     </item>
                     <item>
@@ -7081,6 +7101,9 @@ IS OFF</string>
                  <property name="indicator_status_option" stdset="0">
                   <bool>false</bool>
                  </property>
+                 <property name="python_command_option" stdset="0">
+                  <bool>true</bool>
+                 </property>
                  <property name="on_color" stdset="0">
                   <color>
                    <red>0</red>
@@ -7099,6 +7122,12 @@ IS OFF</string>
                  </property>
                  <property name="top_edge_offset" stdset="0">
                   <double>20.000000000000000</double>
+                 </property>
+                 <property name="true_python_cmd_string" stdset="0">
+                  <string>INSTANCE.stackedWidget_gcode.setCurrentIndex(0)</string>
+                 </property>
+                 <property name="false_python_cmd_string" stdset="0">
+                  <string/>
                  </property>
                  <property name="is_manual_status" stdset="0">
                   <bool>true</bool>
@@ -7194,6 +7223,9 @@ IS OFF</string>
                  <property name="indicator_status_option" stdset="0">
                   <bool>false</bool>
                  </property>
+                 <property name="python_command_option" stdset="0">
+                  <bool>true</bool>
+                 </property>
                  <property name="on_color" stdset="0">
                   <color>
                    <red>0</red>
@@ -7212,6 +7244,12 @@ IS OFF</string>
                  </property>
                  <property name="top_edge_offset" stdset="0">
                   <double>20.000000000000000</double>
+                 </property>
+                 <property name="true_python_cmd_string" stdset="0">
+                  <string>INSTANCE.stackedWidget_gcode.setCurrentIndex(1)</string>
+                 </property>
+                 <property name="false_python_cmd_string" stdset="0">
+                  <string/>
                  </property>
                  <property name="is_mdi_status" stdset="0">
                   <bool>true</bool>
@@ -7307,6 +7345,9 @@ IS OFF</string>
                  <property name="indicator_status_option" stdset="0">
                   <bool>false</bool>
                  </property>
+                 <property name="python_command_option" stdset="0">
+                  <bool>true</bool>
+                 </property>
                  <property name="on_color" stdset="0">
                   <color>
                    <red>0</red>
@@ -7325,6 +7366,12 @@ IS OFF</string>
                  </property>
                  <property name="top_edge_offset" stdset="0">
                   <double>20.000000000000000</double>
+                 </property>
+                 <property name="true_python_cmd_string" stdset="0">
+                  <string>INSTANCE.stackedWidget_gcode.setCurrentIndex(0)</string>
+                 </property>
+                 <property name="false_python_cmd_string" stdset="0">
+                  <string/>
                  </property>
                  <property name="is_auto_status" stdset="0">
                   <bool>true</bool>
@@ -8154,7 +8201,7 @@ IS OFF</string>
             <item>
              <widget class="QGroupBox" name="frame_touchoff">
               <property name="title">
-               <string>TOUCHOFF</string>
+               <string>TOUCHOFF Z</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -11935,10 +11982,9 @@ OFF</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MDILine</class>
-   <extends>QLineEdit</extends>
-   <header>qtvcp.widgets.mdi_line</header>
-   <container>1</container>
+   <class>MDIHistory</class>
+   <extends>QWidget</extends>
+   <header>qtvcp.widgets.mdi_history</header>
   </customwidget>
   <customwidget>
    <class>GcodeEditor</class>

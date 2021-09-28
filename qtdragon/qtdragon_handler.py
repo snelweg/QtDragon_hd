@@ -9,7 +9,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebEngineWidgets import QWebEnginePage
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
-from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET
+from qtvcp.widgets.mdi_history import MDIHistory as MDI_WIDGET
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_TABLE
 from qtvcp.widgets.origin_offsetview import OriginOffsetView as OFFSET_VIEW
 from qtvcp.widgets.stylesheeteditor import  StyleSheetEditor as SSE
@@ -132,6 +132,7 @@ class HandlerClass:
         self.init_probe()
         self.init_utils()
         self.init_joypads()
+        self.w.stackedWidget_gcode.setCurrentIndex(0)
         self.w.stackedWidget_log.setCurrentIndex(0)
         self.w.btn_dimensions.setChecked(True)
         self.w.btn_tool_sensor.setEnabled(self.w.chk_use_tool_sensor.isChecked())
@@ -263,8 +264,12 @@ class HandlerClass:
         self.w.chk_override_limits.setEnabled(False)
         self.w.lbl_home_x.setText(INFO.get_error_safe_setting('JOINT_0', 'HOME',"50"))
         self.w.lbl_home_y.setText(INFO.get_error_safe_setting('JOINT_1', 'HOME',"50"))
+        # gcode file history
         self.w.cmb_gcode_history.addItem("No File Loaded")
         self.w.cmb_gcode_history.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        # mdi history
+        self.w.mdihistory.MDILine.setFixedHeight(30)
+        self.w.mdihistory.MDILine.setPlaceholderText('MDI:')
         # set calculator mode for menu buttons
         for i in ("x", "y", "z", "a"):
             self.w["axistoolbutton_" + i].set_dialog_code('CALCULATOR')
@@ -450,6 +455,7 @@ class HandlerClass:
         name = message.get('NAME')
         unhome_code = bool(message.get('ID') == '_unhome_')
         pause_code = bool(message.get('ID') == '_wait_resume_')
+        clr_mdi_code = bool(message.get('ID') == '_clear_mdi_')
         if unhome_code and name == 'MESSAGE' and rtn is True:
             ACTION.SET_MACHINE_UNHOMED(-1)
         elif pause_code and name == 'MESSAGE':
@@ -457,7 +463,9 @@ class HandlerClass:
             self.eoffset_count.set(0)
             self.spindle_inhibit.set(False)
             self.eoffset_clear.set(False)
-            
+        elif clr_mdi_code and name == 'MESSAGE' and rtn is True:
+            self.w.mdihistory.model.clear()
+
     def command_stopped(self, obj):
         if self.w.chk_pause_spindle.isChecked():
             self.eoffset_clear.set(True)
@@ -960,6 +968,11 @@ class HandlerClass:
         self.styleeditor.styleSheetCombo.setCurrentIndex(self.w.cmb_stylesheet.currentIndex())
         self.styleeditor.on_applyButton_clicked()
 
+    def btn_clear_mdi_clicked(self):
+        info = "This will clear the MDI history window, not the mdi history file"
+        mess = {'NAME':'MESSAGE', 'ICON':'WARNING', 'ID':'_clear_mdi_', 'MESSAGE':'CAUTION', 'MORE':info, 'TYPE':'OKCANCEL'}
+        ACTION.CALL_DIALOG(mess)
+        
     #####################
     # GENERAL FUNCTIONS #
     #####################
