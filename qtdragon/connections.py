@@ -25,6 +25,7 @@ class Connections():
         self.w.btn_touchplate.clicked.connect(self.parent.btn_touchoff_clicked)
         self.w.btn_dimensions.clicked.connect(lambda state: self.parent.btn_dimensions_clicked(state))
         self.w.btn_alpha_mode.clicked.connect(lambda state: self.w.gcodegraphics.set_alpha_mode(state))
+#        self.w.btn_alpha_mode.clicked.connect(lambda state: self.parent.alpha_mode_clicked(state))
         self.w.btn_clear_mdi.clicked.connect(self.parent.btn_clear_mdi_clicked)
         # checkboxes
         self.w.chk_use_mdi_keyboard.stateChanged.connect(lambda state: self.w.mdihistory.set_soft_keyboard(state))
