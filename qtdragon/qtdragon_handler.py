@@ -99,8 +99,8 @@ class HandlerClass:
 
         self.onoff_list = ["program", "tool", "touchoff", "dro", "overrides", "feedrate", "spindle"]
 
-        self.axis_a_list = ["widget_angular_jog", "widget_increments_angular", "dro_axis_a",
-                            "axistoolbutton_a", "btn_zero_a", "btn_goto_zero_a"]
+        self.axis_a_list = ["widget_angular_jog", "widget_increments_angular",
+                            "action_zero_a", "dro_axis_a", "axistoolbutton_a", "btn_goto_zero_a"]
 
         STATUS.connect('general', self.dialog_return)
         STATUS.connect('state-on', lambda w: self.enable_onoff(True))
@@ -226,6 +226,7 @@ class HandlerClass:
         self.w.chk_run_from_line.setChecked(self.w.PREFS_.getpref('Run from line', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_camera.setChecked(self.w.PREFS_.getpref('Use camera', False, bool, 'CUSTOM_FORM_ENTRIES'))
         self.w.chk_use_mpg.setChecked(self.w.PREFS_.getpref('Use MPG jog', False, bool, 'CUSTOM_FORM_ENTRIES'))
+        self.w.chk_use_mdi_keyboard.setChecked(self.w.PREFS_.getpref('Use MDI Keyboard', False, bool, 'CUSTOM_FORM_ENTRIES'))
         
     def closing_cleanup__(self):
         if not self.w.PREFS_: return
@@ -253,6 +254,7 @@ class HandlerClass:
         self.w.PREFS_.putpref('Run from line', self.w.chk_run_from_line.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use camera', self.w.chk_use_camera.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Use MPG jog', self.w.chk_use_mpg.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
+        self.w.PREFS_.putpref('Use MDI Keyboard', self.w.chk_use_mdi_keyboard.isChecked(), bool, 'CUSTOM_FORM_ENTRIES')
         if self.probe:
             self.probe.closing_cleanup__()
 
@@ -270,6 +272,7 @@ class HandlerClass:
         # mdi history
         self.w.mdihistory.MDILine.setFixedHeight(30)
         self.w.mdihistory.MDILine.setPlaceholderText('MDI:')
+        self.w.mdihistory.set_soft_keyboard(self.w.chk_use_mdi_keyboard.isChecked())
         # set calculator mode for menu buttons
         for i in ("x", "y", "z", "a"):
             self.w["axistoolbutton_" + i].set_dialog_code('CALCULATOR')
@@ -465,6 +468,10 @@ class HandlerClass:
             self.eoffset_clear.set(False)
         elif clr_mdi_code and name == 'MESSAGE' and rtn is True:
             self.w.mdihistory.model.clear()
+            fname = os.path.join(PATH.CONFIGPATH, "mdi_history.dat")
+            if os.path.isfile(fname):
+                with open(fname, 'w') as f:
+                    pass
 
     def command_stopped(self, obj):
         if self.w.chk_pause_spindle.isChecked():
@@ -802,9 +809,6 @@ class HandlerClass:
             mess = {'NAME':'MESSAGE', 'ID':'_unhome_', 'MESSAGE':'UNHOME ALL', 'MORE':info, 'TYPE':'OKCANCEL'}
             ACTION.CALL_DIALOG(mess)
 
-    def btn_zero_a_clicked(self):
-        ACTION.SET_AXIS_ORIGIN('A', 0)
-
     # override frame
     def slow_button_clicked(self, state):
         adj = self.w.sender().property('adj')
@@ -944,9 +948,6 @@ class HandlerClass:
         else:
             print("Override limits not set")
 
-    def alpha_mode_clicked(self, state):
-        self.w.gcodegraphics.set_alpha_mode(state)
-
     def chk_use_camera_changed(self, state):
         if state :
             self.w.btn_camera.show()
@@ -969,8 +970,8 @@ class HandlerClass:
         self.styleeditor.on_applyButton_clicked()
 
     def btn_clear_mdi_clicked(self):
-        info = "This will clear the MDI history window, not the mdi history file"
-        mess = {'NAME':'MESSAGE', 'ICON':'WARNING', 'ID':'_clear_mdi_', 'MESSAGE':'CAUTION', 'MORE':info, 'TYPE':'OKCANCEL'}
+        info = "This will clear the MDI history window and the MDI history file"
+        mess = {'NAME':'MESSAGE', 'ICON':'WARNING', 'ID':'_clear_mdi_', 'MESSAGE':'ARE YOU SURE?', 'MORE':info, 'TYPE':'OKCANCEL'}
         ACTION.CALL_DIALOG(mess)
         
     #####################
@@ -1003,10 +1004,6 @@ class HandlerClass:
                 print("Error loading HTML file : {}".format(e))
         else:
             self.add_status("Unknown or invalid filename")
-
-    def disable_spindle_pause(self):
-        self.eoffset_count.set(0)
-        self.spindle_inhibit.set(False)
 
     def touchoff(self, selector):
         if selector == 'touchplate':
