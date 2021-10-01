@@ -94,8 +94,7 @@ class HandlerClass:
         self.unit_speed_list = ["search_vel_units", "probe_vel_units"]
 
         self.lineedit_list = ["work_height", "touch_height", "sensor_height", "laser_x", "laser_y",
-                              "sensor_x", "sensor_y", "camera_x", "camera_y",
-                              "search_vel", "probe_vel", "max_probe", "eoffset_count"]
+                              "camera_x", "camera_y", "search_vel", "probe_vel", "max_probe", "eoffset_count"]
 
         self.onoff_list = ["program", "tool", "touchoff", "dro", "overrides", "feedrate", "spindle"]
 
@@ -207,8 +206,6 @@ class HandlerClass:
         self.reload_tool = self.w.PREFS_.getpref('Tool to load', 0, int,'CUSTOM_FORM_ENTRIES')
         self.w.lineEdit_laser_x.setText(str(self.w.PREFS_.getpref('Laser X', 100, float, 'CUSTOM_FORM_ENTRIES')))
         self.w.lineEdit_laser_y.setText(str(self.w.PREFS_.getpref('Laser Y', -20, float, 'CUSTOM_FORM_ENTRIES')))
-        self.w.lineEdit_sensor_x.setText(str(self.w.PREFS_.getpref('Sensor X', 10, float, 'CUSTOM_FORM_ENTRIES')))
-        self.w.lineEdit_sensor_y.setText(str(self.w.PREFS_.getpref('Sensor Y', 10, float, 'CUSTOM_FORM_ENTRIES')))
         self.w.lineEdit_camera_x.setText(str(self.w.PREFS_.getpref('Camera X', 10, float, 'CUSTOM_FORM_ENTRIES')))
         self.w.lineEdit_camera_y.setText(str(self.w.PREFS_.getpref('Camera Y', 10, float, 'CUSTOM_FORM_ENTRIES')))
         self.w.lineEdit_work_height.setText(str(self.w.PREFS_.getpref('Work Height', 20, float, 'CUSTOM_FORM_ENTRIES')))
@@ -235,8 +232,6 @@ class HandlerClass:
         self.w.PREFS_.putpref('Tool to load', STATUS.get_current_tool(), int, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Laser X', self.w.lineEdit_laser_x.text(), float, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Laser Y', self.w.lineEdit_laser_y.text(), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Sensor X', self.w.lineEdit_sensor_x.text(), float, 'CUSTOM_FORM_ENTRIES')
-        self.w.PREFS_.putpref('Sensor Y', self.w.lineEdit_sensor_y.text(), float, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Camera X', self.w.lineEdit_camera_x.text(), float, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Camera Y', self.w.lineEdit_camera_y.text(), float, 'CUSTOM_FORM_ENTRIES')
         self.w.PREFS_.putpref('Work Height', self.w.lineEdit_work_height.text(), float, 'CUSTOM_FORM_ENTRIES')
@@ -264,6 +259,7 @@ class HandlerClass:
         self.w.adj_spindle_ovr.setValue(100)
         self.w.chk_override_limits.setChecked(False)
         self.w.chk_override_limits.setEnabled(False)
+        self.w.chk_pause_spindle_changed(False)
         self.w.lbl_home_x.setText(INFO.get_error_safe_setting('JOINT_0', 'HOME',"50"))
         self.w.lbl_home_y.setText(INFO.get_error_safe_setting('JOINT_1', 'HOME',"50"))
         # gcode file history
@@ -754,27 +750,19 @@ class HandlerClass:
                 self.scale_select_0.set(self.w.btn_scale_100.property('sel0'))
                 self.scale_select_1.set(self.w.btn_scale_100.property('sel1'))
 
-    # offsets frame
+    # bottom button row
     def btn_goto_location_clicked(self):
         dest = self.w.sender().property('location')
         factor = 1 if STATUS.is_metric_mode() else 1/25.4
         ACTION.CALL_MDI("G90")
-        if dest == 'home':
-            x = float(self.w.lbl_home_x.text()) * factor
-            y = float(self.w.lbl_home_y.text()) * factor
-            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
-            command = "G53 G0 X{:3.4f} Y{:3.4f}".format(x, y)
+        if dest == 'zero':
+            ACTION.CALL_INI_MDI(0)
+        elif dest == 'home':
+            ACTION.CALL_INI_MDI(1)
         elif dest == 'sensor':
-            x = float(self.w.lineEdit_sensor_x.text()) * factor
-            y = float(self.w.lineEdit_sensor_y.text()) * factor
-            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
-            command = "G53 G0 X{:3.4f} Y{:3.4f}".format(x, y)
-        elif dest == 'zero':
-            ACTION.CALL_MDI_WAIT("G53 G0 Z0")
-            command = "G0 X0 Y0"
+            ACTION.CALL_INI_MDI(2)
         elif dest == 'zero_a':
-            command = "G0 A0"
-        ACTION.CALL_MDI_WAIT(command,10)
+            ACTION.CALL_MDI_WAIT("G0 A0", 10)
 
     def btn_ref_laser_clicked(self):
         if self.w.btn_laser_on.isChecked():
@@ -789,6 +777,7 @@ class HandlerClass:
         else:
             self.add_status("Laser must be on to set laser offset")
 
+    # touchoff-z frame
     def btn_touchoff_clicked(self):
         if STATUS.get_current_tool() == 0:
             self.add_status("Cannot touchoff with no tool loaded")
