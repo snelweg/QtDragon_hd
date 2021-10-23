@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # Qtvcp Joypad widget
 #
 # Copyright (c) 2021  Jim Sloot <persei802@gmail.com>
@@ -18,9 +18,22 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QPoint, QPointF, QLineF, QRect, QRectF, QSize, QSizeF, QEvent
 from PyQt5.QtGui import QPainter, QPainterPath, QPen, QBrush, QColor, QFont, QPixmap, QRadialGradient
 
+import hal
+from qtvcp.widgets.widget_baseclass import _HalWidgetBase
+
 class JoyPad(QtWidgets.QWidget):
-    joy_btn_clicked = QtCore.pyqtSignal(str)
+    joy_btn_pressed = QtCore.pyqtSignal(str)
     joy_btn_released = QtCore.pyqtSignal(str)
+    joy_l_pressed = QtCore.pyqtSignal(bool)
+    joy_l_released = QtCore.pyqtSignal(bool)
+    joy_r_pressed = QtCore.pyqtSignal(bool)
+    joy_r_released = QtCore.pyqtSignal(bool)
+    joy_c_pressed = QtCore.pyqtSignal(bool)
+    joy_c_released = QtCore.pyqtSignal(bool)
+    joy_t_pressed = QtCore.pyqtSignal(bool)
+    joy_t_released = QtCore.pyqtSignal(bool)
+    joy_b_pressed = QtCore.pyqtSignal(bool)
+    joy_b_released = QtCore.pyqtSignal(bool)
     def __init__(self, parent=None):
         super(JoyPad, self).__init__(parent)
         self.rect1 = QRectF()
@@ -30,7 +43,16 @@ class JoyPad(QtWidgets.QWidget):
         self.top_image = None
         self.bottom_image = None
         self.center_image = None
-        self.highlight_color = QColor('gray')
+        self._dummyPixmap = QtGui.QPixmap()
+        self._textL = ''
+        self._textR = ''
+        self._textC = ''
+        self._textT = ''
+        self._textB = ''
+        self.colorState = False
+        self._true_color = QColor('lawngreen')
+        self._false_color = QColor('gray')
+        self.highlight_color = self._false_color
         self.highlight_left = False
         self.highlight_right = False
         self.highlight_top = False
@@ -43,6 +65,9 @@ class JoyPad(QtWidgets.QWidget):
         self.btn_names = {'L': 'left', 'R': 'right', 'T': 'top', 'B': 'bottom', 'C': 'center'}
         self.tooltips = {'L': '', 'R': '', 'T': '', 'B': '', 'C': ''}
         self.axis_list = ('X', 'Y', 'Z', 'A')
+        # we want center active for an indicator light
+        # should be set in program if needed
+#        self.set_highlight('C', True)
 
     def eventFilter(self, obj, event):
         if obj is self and self.isEnabled():
@@ -54,18 +79,26 @@ class JoyPad(QtWidgets.QWidget):
                     active_btn = self.get_active_btn(pos)
                     self.last_active_btn = active_btn
                     if active_btn is not None:
-                        self.joy_btn_clicked.emit(active_btn)
+                        self._pressedOutput(active_btn)
             elif event.type() == QEvent.MouseButtonRelease:
                 if event.button() == Qt.RightButton:
                     event.ignore()
                 elif self.last_active_btn is not None:
-                    self.joy_btn_released.emit(self.last_active_btn)
+                    self._releasedOutput(self.last_active_btn)
             elif event.type() == QEvent.MouseMove:
                 pos = event.pos()
                 active_btn = self.get_active_btn(pos)
                 if active_btn is not None:
                     self.setToolTip(self.tooltips[active_btn])
         return super(JoyPad, self).eventFilter(obj, event)
+
+    def _pressedOutput(self, btncode):
+        self.joy_btn_pressed.emit(btncode)
+        self['joy_{}_pressed'.format(btncode.lower())].emit(True)
+
+    def _releasedOutput(self, btncode):
+        self.joy_btn_released.emit(btncode)
+        self['joy_{}_released'.format(btncode.lower())].emit(False)
 
     def get_active_btn(self, pos):
         if self.center_path.contains(pos): return 'C'
@@ -117,7 +150,7 @@ class JoyPad(QtWidgets.QWidget):
     def draw_painter_paths(self, qp, event):
         w = min(event.rect().width(), event.rect().height())
         center = event.rect().center()
-        fp = QPoint(center.x() - w/4, center.y() - w/4)
+        fp = QPoint(int(center.x() - w/4), int(center.y() - w/4))
         bg = QRadialGradient(center, w/2, fp)
         bg.setColorAt(0, QColor(180, 180, 180))
         bg.setColorAt(1, QColor(40, 40, 40))
@@ -131,33 +164,33 @@ class JoyPad(QtWidgets.QWidget):
 
     def draw_icons(self, qp, event):
         rect = QRect()
-        rect.setSize(QSize(self.rect1.width() * 0.4, self.rect1.height() * 0.4))
+        rect.setSize(QSize(int(self.rect1.width() * 0.4), int(self.rect1.height() * 0.4)))
         center = event.rect().center()
         qp.setPen(QPen(Qt.white, 2))
         qp.setFont(QFont('Lato Heavy', 20))
         # left button
-        rect.moveCenter(QPoint(center.x() - self.rect2.width()/3, center.y()))
+        rect.moveCenter(QPoint(int(center.x() - self.rect2.width()/3), center.y()))
         if isinstance(self.left_image, QPixmap):
             pix = self.left_image
             qp.drawPixmap(rect, pix, pix.rect())
         elif isinstance(self.left_image, str):
             qp.drawText(rect, Qt.AlignCenter, self.left_image)
         # right button
-        rect.moveCenter(QPoint(center.x() + self.rect2.width()/3, center.y()))
+        rect.moveCenter(QPoint(int(center.x() + self.rect2.width()/3), center.y()))
         if isinstance(self.right_image, QPixmap):
             pix = self.right_image
             qp.drawPixmap(rect, pix, pix.rect())
         elif isinstance(self.right_image, str):
             qp.drawText(rect, Qt.AlignCenter, self.right_image)
         # bottom button
-        rect.moveCenter(QPoint(center.x(), center.y() + self.rect2.width()/3))
+        rect.moveCenter(QPoint(center.x(), int(center.y() + self.rect2.width()/3)))
         if isinstance(self.bottom_image, QPixmap):
             pix = self.bottom_image
             qp.drawPixmap(rect, pix, pix.rect())
         elif isinstance(self.bottom_image, str):
             qp.drawText(rect, Qt.AlignCenter, self.bottom_image)
         # top button
-        rect.moveCenter(QPoint(center.x(), center.y() - self.rect2.width()/3))
+        rect.moveCenter(QPoint(center.x(), int(center.y() - self.rect2.width()/3)))
         if isinstance(self.top_image, QPixmap):
             pix = self.top_image
             qp.drawPixmap(rect, pix, pix.rect())
@@ -178,16 +211,17 @@ class JoyPad(QtWidgets.QWidget):
         rect.moveCenter(center)
         pen_width = self.rect1.width() * 0.08
         qp.setPen(QPen(self.highlight_color, pen_width, cap = Qt.FlatCap))
-        if self.highlight_right is True:
-            qp.drawArc(rect, -45 * 16, 90 * 16)
-        if self.highlight_left is True:
-            qp.drawArc(rect, 135 * 16, 90 * 16)
-        if self.highlight_top is True:
-            qp.drawArc(rect, 45 * 16, 90 * 16)
-        if self.highlight_bottom is True:
-            qp.drawArc(rect, 225 * 16, 90 * 16)
         if self.highlight_center is True:
             qp.drawArc(rect, 0, 5760)
+        else:
+            if self.highlight_right is True:
+                qp.drawArc(rect, -45 * 16, 90 * 16)
+            if self.highlight_left is True:
+                qp.drawArc(rect, 135 * 16, 90 * 16)
+            if self.highlight_top is True:
+                qp.drawArc(rect, 45 * 16, 90 * 16)
+            if self.highlight_bottom is True:
+                qp.drawArc(rect, 225 * 16, 90 * 16)
 
     def set_highlight(self, btn, state):
         if btn not in self.axis_list and btn not in self.btn_names.keys(): return
@@ -206,7 +240,10 @@ class JoyPad(QtWidgets.QWidget):
         if btn not in self.btn_names.keys(): return
         name = self.btn_names[btn]
         if kind == 'image':
-            self[name + "_image"] = QPixmap(data)
+            if data is None:
+                self[name + "_image"] = None
+            else:
+                self[name + "_image"] = QPixmap(data)
         elif kind == 'text':
             self[name + "_image"] = data
         else: return
@@ -216,22 +253,188 @@ class JoyPad(QtWidgets.QWidget):
         if btn in self.btn_names.keys():
             self.tooltips[btn] = tip
 
-    @QtCore.pyqtSlot(QColor)
-    def set_highlight_color(self, color):
-        self.highlight_color = color
+    def setLight(self, data):
+        if data:
+            self.highlight_color = self._true_color
+        else:
+            self.highlight_color = self._false_color
         self.update()
 
-    def get_highlight_color(self):
-        return self.highlight_color
 
-    def reset_highlight_color(self):
-        self.highlight_color = QColor('gray')
+    @QtCore.pyqtSlot()
+    def set_colorStateTrue(self):
+        self.setLight(True)
+    @QtCore.pyqtSlot()
+    def set_colorStateFalse(self):
+        self.setLight(False)
 
-    HighlightColor = QtCore.pyqtProperty(QColor, get_highlight_color, set_highlight_color, reset_highlight_color)
+    @QtCore.pyqtSlot(bool)
+    def set_colorState(self, state):
+        self.colorState = bool(state)
+        self.setLight(state)
+
+    def get_colorState(self):
+        return self.colorState
+
+    def reset_colorState(self):
+        self.colorState = False
+        self.setLight(False)
+
+    setColorState = QtCore.pyqtProperty(bool, get_colorState, set_colorState, reset_colorState)
+
+    def setLeftImagePath(self, data):
+        if data.isNull():
+            data = None
+        self.set_icon('L', 'image', data)
+    def getLeftImagePath(self):
+        if isinstance(self.left_image, QPixmap):
+            self.left_image
+        else:
+            return self._dummyPixmap
+    def resetLeftImagePath(self):
+        pass
+
+    def setRightImagePath(self, data):
+        if data.isNull():
+            data = None
+        self.set_icon('R', 'image', data)
+    def getRightImagePath(self):
+        return self._dummyPixmap
+    def resetRightImagePath(self):
+        pass
+
+    def setCenterImagePath(self, data):
+        if data.isNull():
+            data = None
+        self.set_icon('C', 'image', data)
+    def getCenterImagePath(self):
+        return self._dummyPixmap
+    def resetCenterImagePath(self):
+        pass
+
+    def setTopImagePath(self, data):
+        if data.isNull():
+            data = None
+        self.set_icon('T', 'image', data)
+    def getTopImagePath(self):
+        return self._dummyPixmap
+    def resetTopImagePath(self):
+        pass
+
+    def setBottomImagePath(self, data):
+        if data.isNull():
+            data = None
+        self.set_icon('B', 'image', data)
+    def getBottomImagePath(self):
+        return self._dummyPixmap
+    def resetBottomImagePath(self):
+        pass
+
+    left_image_path = QtCore.pyqtProperty(QPixmap, getLeftImagePath, setLeftImagePath, resetLeftImagePath)
+    right_image_path = QtCore.pyqtProperty(QPixmap, getRightImagePath, setRightImagePath, resetRightImagePath)
+    center_image_path = QtCore.pyqtProperty(QPixmap, getCenterImagePath, setCenterImagePath, resetCenterImagePath)
+    top_image_path = QtCore.pyqtProperty(QPixmap, getTopImagePath, setTopImagePath, resetTopImagePath)
+    bottom_image_path = QtCore.pyqtProperty(QPixmap, getBottomImagePath, setBottomImagePath, resetBottomImagePath)
+
+    def setLeftText(self, data):
+        self._textL = data
+        if not data.strip():
+            data = None
+        self.set_icon('L', 'text', data)
+    def getLeftText(self):
+        return self._textL
+    def resetLeftText(self):
+        self._textL = ''
+        self.set_icon('L', 'text', '')
+
+    def setRightText(self, data):
+        self._textR = data
+        if not data.strip():
+            data = None
+        self.set_icon('R', 'text', data)
+    def getRightText(self):
+        return self._textR
+    def resetRightText(self):
+        self._textR = ''
+        self.set_icon('R', 'text', '')
+
+    def setCenterText(self, data):
+        self._textC = data
+        if not data.strip():
+            data = None
+        self.set_icon('C', 'text', data)
+    def getCenterText(self):
+        return self._textC
+    def resetCenterText(self):
+        self._textC = ''
+        self.set_icon('C', 'text', '')
+
+    def setTopText(self, data):
+        self._textT = data
+        if not data.strip():
+            data = None
+        self.set_icon('T', 'text', data)
+    def getTopText(self):
+        return self._textT
+    def resetTopText(self):
+        self._textT = ''
+        self.set_icon('T', 'text', '')
+
+    def setBottomText(self, data):
+        self._textB = data
+        if not data.strip():
+            data = None
+        self.set_icon('B', 'text', data)
+    def getBottomText(self):
+        return self._textB
+    def resetBottomText(self):
+        self._textB = ''
+        self.set_icon('B', 'text', '')
+
+    left_text = QtCore.pyqtProperty(str, getLeftText, setLeftText, resetLeftText)
+    right_text = QtCore.pyqtProperty(str, getRightText, setRightText, resetRightText)
+    center_text = QtCore.pyqtProperty(str, getCenterText, setCenterText, resetCenterText)
+    top_text = QtCore.pyqtProperty(str, getTopText, setTopText, resetTopText)
+    bottom_text = QtCore.pyqtProperty(str, getBottomText, setBottomText, resetBottomText)
+
+    @QtCore.pyqtSlot(QColor)
+    def set_true_color(self, color):
+        self._true_color = color
+        self.setLight(self.colorState)
+    @QtCore.pyqtSlot(str)
+    def set_true_color(self, color):
+        self._true_color = QColor(color)
+        self.setLight(self.colorState)
+
+    def get_true_color(self):
+        return self._true_color
+
+    def reset_true_color(self):
+        self._true_color = QColor('lawngreen')
+        self.setLight(self.colorState)
+
+    @QtCore.pyqtSlot(QColor)
+    def set_false_color(self, color):
+        self._false_color = color
+        self.setLight(self.colorState)
+    @QtCore.pyqtSlot(str)
+    def set_false_color(self, color):
+        self._false_color = QColor(color)
+        self.setLight(self.colorState)
+
+    def get_false_color(self):
+        return self._false_color
+
+    def reset_false_color(self):
+        self._false_color = QColor('gray')
+        self.setLight(self.colorState)
+
+    true_color = QtCore.pyqtProperty(QColor, get_true_color, set_true_color, reset_true_color)
+    false_color = QtCore.pyqtProperty(QColor, get_false_color, set_false_color, reset_false_color)
 
     @QtCore.pyqtSlot(str)
-    def btn_clicked(self, btn):
-        print("Button clicked", btn)
+    def btn_pressed(self, btn):
+        print("Button pressed", btn)
 
     @QtCore.pyqtSlot(str)
     def btn_released(self, btn):
@@ -243,6 +446,138 @@ class JoyPad(QtWidgets.QWidget):
 
     def __setitem__(self, item, value):
         return setattr(self, item, value)
+
+class HALPad(JoyPad, _HalWidgetBase):
+    def __init__(self, parent=None):
+        super(HALPad, self).__init__(parent)
+        self._pin_name = ''
+        self._bit_pin_type = True
+        self._s32_pin_type = False
+        self._float_pin_type = False
+
+        self._trueOutputR = 1.0
+        self._trueOutputL = 1.0
+        self._trueOutputC = 1.0
+        self._trueOutputT = 1.0
+        self._trueOutputB = 1.0
+        self._falseOutput = 0.0
+
+        self._true_color = QColor('lawngreen')
+        self._false_color = QColor('red')
+
+        # we want center active for an indicator light
+        self.set_highlight('C', True)
+        self.setLight(False)
+
+    def _hal_init(self):
+        if self._pin_name == '':
+            pname = self.HAL_NAME_
+        else:
+            pname = self._pin_name
+        if self._bit_pin_type:
+            ptype = hal.HAL_BIT
+        elif self._float_pin_type:
+            ptype =  hal.HAL_FLOAT
+        elif self._s32_pin_type:
+            ptype =  hal.HAL_S32
+        self.halPinR = self.HAL_GCOMP_.newpin(pname + '.right', ptype, hal.HAL_OUT)
+        self.halPinL = self.HAL_GCOMP_.newpin(pname + '.left', ptype, hal.HAL_OUT)
+        self.halPinT = self.HAL_GCOMP_.newpin(pname + '.top', ptype, hal.HAL_OUT)
+        self.halPinB = self.HAL_GCOMP_.newpin(pname + '.bottom', ptype, hal.HAL_OUT)
+        self.halPinC = self.HAL_GCOMP_.newpin(pname + '.center', ptype, hal.HAL_OUT)
+        self.halPinLightCenter = self.HAL_GCOMP_.newpin(pname + '.light.center', hal.HAL_BIT, hal.HAL_IN)
+        self.halPinLightCenter.value_changed.connect(lambda data: self.setLight(data))
+
+    def _pressedOutput(self, btncode):
+        self.joy_btn_pressed.emit(btncode)
+        self['joy_{}_pressed'.format(btncode.lower())].emit(True)
+
+        if self._bit_pin_type:
+            data = True
+        elif self._float_pin_type:
+            data = float(self['_trueOutput{}'.format(btncode)])
+        elif self._s32_pin_type:
+            data = int(self['_trueOutput{}'.format(btncode)])
+        try:
+            self['halPin{}'.format(btncode)].set(data)
+        except:
+            pass
+
+    def _releasedOutput(self, btncode):
+        self.joy_btn_released.emit(btncode)
+        self['joy_{}_released'.format(btncode.lower())].emit(False)
+
+        if self._bit_pin_type:
+            data = False
+        elif self._float_pin_type:
+            data = float(self._falseOutput)
+        elif self._s32_pin_type:
+            data = int(self._falseOutput)
+        try:
+            self['halPin{}'.format(btncode)].set(data)
+        except:
+            pass
+
+    def setPinTrueOutput(self, btn, data):
+        btncode = self.btn_names[btn.lower()]
+        self['_trueOutput{}'.format(btncode)] = data
+
+
+
+    #########################################################################
+    # This is how designer can interact with our widget properties.
+    # designer will show the pyqtProperty properties in the editor
+    # it will use the get set and reset calls to do those actions
+    ########################################################################
+
+    def _toggle_properties(self, picked):
+        data = ('bit', 's32', 'float')
+
+        for i in data:
+            if not i == picked:
+                self[i+'_pin_type'] = False
+
+    def set_pin_name(self, value):
+        self._pin_name = value
+    def get_pin_name(self):
+        return self._pin_name
+    def reset_pin_name(self):
+        self._pin_name = ''
+
+    def set_bit_pin_type(self, value):
+        self._bit_pin_type = value
+        if value:
+            self._toggle_properties('bit')
+    def get_bit_pin_type(self):
+        return self._bit_pin_type
+    def reset_bit_pin_type(self):
+        self._bit_pin_type = ''
+
+    def set_s32_pin_type(self, value):
+        self._s32_pin_type = value
+        if value:
+            self._toggle_properties('s32')
+    def get_s32_pin_type(self):
+        return self._s32_pin_type
+    def reset_s32_pin_type(self):
+        self._s32_pin_type = ''
+
+    def set_float_pin_type(self, value):
+        self._float_pin_type = value
+        if value:
+            self._toggle_properties('float')
+    def get_float_pin_type(self):
+        return self._float_pin_type
+    def reset_float_pin_type(self):
+        self._float_pin_type = ''
+
+    # designer will show these properties in this order:
+    pin_name = QtCore.pyqtProperty(str, get_pin_name, set_pin_name, reset_pin_name)
+
+    bit_pin_type = QtCore.pyqtProperty(bool, get_bit_pin_type, set_bit_pin_type, reset_bit_pin_type)
+    s32_pin_type = QtCore.pyqtProperty(bool, get_s32_pin_type, set_s32_pin_type, reset_s32_pin_type)
+    float_pin_type = QtCore.pyqtProperty(bool, get_float_pin_type, set_float_pin_type, reset_float_pin_type)
+
 
     #############################
     # Testing                   #
@@ -262,12 +597,13 @@ if __name__ == "__main__":
     joy.set_icon('C', 'image', 'stop.png')
     joy.set_tooltip('T', 'This is the top button')
     joy.set_tooltip('C', 'This is the center button')
-    joy.set_highlight_color('red')
-    joy.set_highlight('C', True)
-    joy.joy_btn_clicked.connect(joy.btn_clicked)
+    joy.set_false_color('red')
+    joy.set_highlight('T', True)
+    joy.joy_btn_pressed.connect(joy.btn_pressed)
     joy.joy_btn_released.connect(joy.btn_released)
     layout = QtWidgets.QVBoxLayout()
     layout.addWidget(joy)
     w.setLayout(layout)
     w.show()
     sys.exit( app.exec_() )
+

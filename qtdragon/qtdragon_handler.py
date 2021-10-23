@@ -2,12 +2,11 @@ import os
 import hal, hal_glib
 import linuxcnc
 from connections import Connections
-from joypad import JoyPad
-from facing import Facing
-from hole_circle import Hole_Circle
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebEngineWidgets import QWebEnginePage
+from qtvcp.lib.gcode_utility.facing import Facing
+from qtvcp.lib.gcode_utility.hole_circle import Hole_Circle
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
 from qtvcp.widgets.mdi_history import MDIHistory as MDI_WIDGET
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_TABLE
@@ -65,9 +64,6 @@ class HandlerClass:
         self.progress = None
         self.pause_dialog = None
         self.factor = 1.0
-        self.jog_az = JoyPad()
-        self.jog_xy = JoyPad()
-        self.pgm_control = JoyPad()
         self.run_color = QtGui.QColor('green')
         self.stop_color = QtGui.QColor('red')
         self.pause_color = QtGui.QColor('yellow')
@@ -86,6 +82,7 @@ class HandlerClass:
         self.slow_jog_factor = 10
         self.reload_tool = 0
         self.last_loaded_program = ""
+        self.current_loaded_program = None
         self.first_turnon = True
         self.icon_btns = {'action_exit': 'SP_BrowserStop',
                           'btn_load_file': 'SP_DialogOpenButton'}
@@ -334,41 +331,12 @@ class HandlerClass:
         self.w.layout_hole_circle.addWidget(self.hole_circle)
 
     def init_joypads(self):
-        # jog A and Z
-        self.w.layout_jog_buttons.addWidget(self.jog_az)
-        if 'A' in self.axis_list:
-            self.jog_az.set_icon('L', 'text', 'A-')
-            self.jog_az.set_icon('R', 'text', 'A+')
-        if 'Z' in self.axis_list:
-            self.jog_az.set_icon('T', 'text', 'Z+')
-            self.jog_az.set_icon('B', 'text', 'Z-')
-        self.jog_az.joy_btn_clicked.connect(self.jog_az_clicked)
-        self.jog_az.joy_btn_released.connect(self.jog_az_released)
-        # jog X and Y
-        self.w.layout_jog_buttons.addWidget(self.jog_xy)
-        if 'X' in self.axis_list:
-            self.jog_xy.set_icon('L', 'text', 'X-')
-            self.jog_xy.set_icon('R', 'text', 'X+')
-        if 'Y' in self.axis_list:
-            self.jog_xy.set_icon('T', 'text', 'Y+')
-            self.jog_xy.set_icon('B', 'text', 'Y-')
-        self.jog_xy.joy_btn_clicked.connect(self.jog_xy_clicked)
-        self.jog_xy.joy_btn_released.connect(self.jog_xy_released)
-        # program controls
-        self.w.layout_program_control.addWidget(self.pgm_control)
-        self.pgm_control.set_tooltip('T', "RUN")
-        self.pgm_control.set_tooltip('L', "RELOAD")
-        self.pgm_control.set_tooltip('R', "STEP")
-        self.pgm_control.set_tooltip('B', "PAUSE")
-        self.pgm_control.set_tooltip('C', "STOP")
-        self.pgm_control.set_icon('L', 'image', 'qtdragon/images/reload.png')
-        self.pgm_control.set_icon('R', 'image', 'qtdragon/images/step.png')
-        self.pgm_control.set_icon('T', 'image', 'qtdragon/images/run.png')
-        self.pgm_control.set_icon('B', 'image', 'qtdragon/images/pause.png')
-        self.pgm_control.set_icon('C', 'image', 'qtdragon/images/stop.png')
-        self.pgm_control.set_highlight_color(self.stop_color)
-        self.pgm_control.set_highlight('C', True)
-        self.pgm_control.joy_btn_clicked.connect(self.pgm_control_clicked)
+        self.w.pgm_control.set_tooltip('T', "RUN")
+        self.w.pgm_control.set_tooltip('L', "RELOAD")
+        self.w.pgm_control.set_tooltip('R', "STEP")
+        self.w.pgm_control.set_tooltip('B', "PAUSE")
+        self.w.pgm_control.set_tooltip('C', "STOP")
+        self.w.pgm_control.set_true_color(self.stop_color)
 
     def processed_key_event__(self,receiver,event,is_pressed,key,code,shift,cntrl):
         # when typing in MDI, we don't want keybinding to call functions
@@ -506,6 +474,7 @@ class HandlerClass:
             self.add_status("Loaded file {}".format(filename))
             self.w.progressBar.reset()
             self.last_loaded_program = filename
+            self.current_loaded_program = filename
             self.w.lbl_runtime.setText("00:00:00")
         else:
             self.add_status("Filename not valid")
@@ -627,18 +596,18 @@ class HandlerClass:
             ACTION.OPEN_PROGRAM(filename)
 
     # program frame
-    def pgm_control_clicked(self, btn):
+    def pgm_control_pressed(self, btn):
         if btn == 'T':
             self.btn_run_clicked()
         elif btn == 'B':
             if STATUS.is_on_and_idle(): return
             if STATUS.is_auto_paused():
-                self.pgm_control.set_tooltip('B', "PAUSE")
-                self.pgm_control.set_highlight_color(self.run_color)
+                self.w.pgm_control.set_tooltip('B', "PAUSE")
+                self.w.pgm_control.set_true_color(self.run_color)
                 ACTION.PAUSE()
             else:
-                self.pgm_control.set_tooltip('B', "RESUME")
-                self.pgm_control.set_highlight_color(self.pause_color)
+                self.w.pgm_control.set_tooltip('B', "RESUME")
+                self.w.pgm_control.set_true_color(self.pause_color)
                 ACTION.PAUSE()
                 if self.w.chk_pause_spindle.isChecked():
                     self.pause_spindle()
@@ -648,8 +617,8 @@ class HandlerClass:
             ACTION.STEP()
         elif btn == "C":
             ACTION.ABORT()
-            self.pgm_control.set_tooltip('B', "PAUSE")
-            self.pgm_control.set_highlight_color(self.stop_color)
+            self.w.pgm_control.set_tooltip('B', "PAUSE")
+            self.w.pgm_control.set_true_color(self.stop_color)
 
     def btn_run_clicked(self):
         if self.w.main_tab_widget.currentIndex() != 0:
@@ -660,7 +629,10 @@ class HandlerClass:
         if STATUS.is_auto_running():
             self.add_status("Program is already running")
             return
-        self.pgm_control.set_highlight_color(self.run_color)
+        if self.current_loaded_program is None:
+            self.add_status("No program has been loaded")
+            return
+        self.w.pgm_control.set_true_color(self.run_color)
         self.run_time = 0
         self.w.lbl_runtime.setText("00:00:00")
         if self.start_line <= 1:
@@ -702,7 +674,7 @@ class HandlerClass:
         self.w.lbl_spindle_pause.setText(text)
 
     # jogging frame
-    def jog_xy_clicked(self, btn):
+    def jog_xy_pressed(self, btn):
         if btn not in ("L", "R", "T", "B"): return
         axis = 0 if btn == "L" or btn == "R" else 1
         direction = 1 if btn == "T" or btn == "R" else -1
@@ -716,7 +688,7 @@ class HandlerClass:
         ACTION.ensure_mode(linuxcnc.MODE_MANUAL)
         ACTION.DO_JOG(axis, 0)
 
-    def jog_az_clicked(self, btn):
+    def jog_az_pressed(self, btn):
         if btn not in ("L", "R", "T", "B"): return
         axis = 3 if btn == "L" or btn == "R" else 2
         direction = 1 if btn == "T" or btn == "R" else -1
@@ -734,10 +706,10 @@ class HandlerClass:
         if not state:
             self.scale_select_0.set(1)
             self.scale_select_1.set(1)
-            if "X" in self.axis_list: self.jog_xy.set_highlight('X', True)
-            if "Y" in self.axis_list: self.jog_xy.set_highlight('Y', True)
-            if "Z" in self.axis_list: self.jog_az.set_highlight('Z', True)
-            if "A" in self.axis_list: self.jog_az.set_highlight('A', True)
+            if "X" in self.axis_list: self.w.jog_xy.set_highlight('X', True)
+            if "Y" in self.axis_list: self.w.jog_xy.set_highlight('Y', True)
+            if "Z" in self.axis_list: self.w.jog_az.set_highlight('Z', True)
+            if "A" in self.axis_list: self.w.jog_az.set_highlight('A', True)
         else:
             self.show_selected_axis(None)
             if   self.w.btn_scale_1.isChecked():
@@ -968,11 +940,11 @@ class HandlerClass:
     #####################
     def show_selected_axis(self, obj):
         if self.w.chk_use_mpg.isChecked():
-            self.jog_xy.set_highlight('X', bool(self.axis_select_x.get() is True))
-            self.jog_xy.set_highlight('Y', bool(self.axis_select_y.get() is True))
-            self.jog_az.set_highlight('Z', bool(self.axis_select_z.get() is True))
+            self.w.jog_xy.set_highlight('X', bool(self.axis_select_x.get() is True))
+            self.w.jog_xy.set_highlight('Y', bool(self.axis_select_y.get() is True))
+            self.w.jog_az.set_highlight('Z', bool(self.axis_select_z.get() is True))
             if 'A' in self.axis_list:
-                self.jog_az.set_highlight('A', bool(self.axis_select_a.get() is True))
+                self.w.jog_az.set_highlight('A', bool(self.axis_select_a.get() is True))
 
     def load_code(self, fname):
         if fname is None: return
@@ -1043,9 +1015,9 @@ class HandlerClass:
         self.eoffset_count.set(0)
         for widget in self.onoff_list:
             self.w["frame_" + widget].setEnabled(state)
-        self.jog_xy.setEnabled(state)
-        self.jog_az.setEnabled(state)
-        self.pgm_control.setEnabled(state)
+        self.w.jog_xy.setEnabled(state)
+        self.w.jog_az.setEnabled(state)
+        self.w.pgm_control.setEnabled(state)
 
     def set_start_line(self, line):
         self.w.gcodegraphics.highlight_graphics(line)
@@ -1061,7 +1033,7 @@ class HandlerClass:
             return False
 
     def stop_timer(self):
-        self.pgm_control.set_highlight_color(self.stop_color)
+        self.w.pgm_control.set_true_color(self.stop_color)
         if self.timer_on:
             self.timer_on = False
             self.add_status("Run timer stopped at {}".format(self.w.lbl_runtime.text()))

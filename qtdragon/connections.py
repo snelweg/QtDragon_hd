@@ -5,6 +5,11 @@ class Connections():
         self.w = widget
         self.parent = parent
         # buttons
+        self.w.jog_xy.joy_btn_pressed.connect( self.parent.jog_xy_pressed)
+        self.w.jog_xy.joy_btn_released.connect(self.parent.jog_xy_released)
+        self.w.jog_az.joy_btn_pressed.connect(self.parent.jog_az_pressed)
+        self.w.jog_az.joy_btn_released.connect(self.parent.jog_az_released)
+        self.w.pgm_control.joy_btn_pressed.connect(self.parent.pgm_control_pressed)
         self.w.btn_jog_l_slow.clicked.connect(self.parent.slow_button_clicked)
         self.w.btn_jog_a_slow.clicked.connect(self.parent.slow_button_clicked)
         self.w.btn_load_file.clicked.connect(self.parent.btn_load_file_clicked)

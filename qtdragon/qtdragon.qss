@@ -352,6 +352,10 @@ QScrollBar::sub-page:vertical {
 }
 
 /** Tab Widget **/
+QTabWidget {
+    border: none;
+}
+
 QTabBar::tab {
     background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 #303030, stop:1 #909090);
     border: 1px solid black;
@@ -364,6 +368,7 @@ QTabBar::tab {
 
 QTabBar::tab:selected {
     background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:1 #e0e0e0);
+    border: 1px solid #e0e0e0;
     color: #202020;
 }
 
@@ -441,11 +446,6 @@ QMenu::item:selected {
 QStatusBar {
     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.7, y2:0, stop:0 #202020, stop:1 #606060);
     color: #e0e0e0;
-}
-
-/** Joypads **/
-JoyPad {
-    qproperty-HighlightColor: #00aaff;
 }
 
 /** GCode Display **/

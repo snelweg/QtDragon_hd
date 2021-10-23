@@ -5436,7 +5436,7 @@ CAMERA</string>
                        <number>2</number>
                       </property>
                       <property name="text">
-                       <string>07:52:08 AM</string>
+                       <string>08:44:08 AM</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
@@ -5854,7 +5854,7 @@ MDI</string>
              <height>16777215</height>
             </size>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,0,0">
+           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0">
             <property name="spacing">
              <number>4</number>
             </property>
@@ -5871,20 +5871,71 @@ MDI</string>
              <number>4</number>
             </property>
             <item>
-             <layout class="QVBoxLayout" name="layout_jog_buttons">
-              <property name="leftMargin">
-               <number>4</number>
+             <widget class="JoyPad" name="jog_az">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="topMargin">
-               <number>4</number>
+              <property name="highlightPosition" stdset="0">
+               <enum>JoyPad::NONE</enum>
               </property>
-              <property name="rightMargin">
-               <number>4</number>
+              <property name="setColorState" stdset="0">
+               <bool>true</bool>
               </property>
-              <property name="bottomMargin">
-               <number>4</number>
+              <property name="left_text" stdset="0">
+               <string>&lt;A</string>
               </property>
-             </layout>
+              <property name="right_text" stdset="0">
+               <string>A&gt;</string>
+              </property>
+              <property name="top_text" stdset="0">
+               <string>Z+</string>
+              </property>
+              <property name="bottom_text" stdset="0">
+               <string>Z-</string>
+              </property>
+              <property name="true_color" stdset="0">
+               <color>
+                <red>0</red>
+                <green>200</green>
+                <blue>255</blue>
+               </color>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="JoyPad" name="jog_xy">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="setColorState" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="left_text" stdset="0">
+               <string>&lt;X</string>
+              </property>
+              <property name="right_text" stdset="0">
+               <string>X&gt;</string>
+              </property>
+              <property name="top_text" stdset="0">
+               <string>Y+</string>
+              </property>
+              <property name="bottom_text" stdset="0">
+               <string>Y-</string>
+              </property>
+              <property name="true_color" stdset="0">
+               <color>
+                <red>0</red>
+                <green>200</green>
+                <blue>255</blue>
+               </color>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QWidget" name="widget_encoder_control" native="true">
@@ -7471,7 +7522,7 @@ IS OFF</string>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_28" stretch="1,0,0,0,0">
+            <layout class="QVBoxLayout" name="verticalLayout_28" stretch="0,0,0,0,0">
              <property name="spacing">
               <number>6</number>
              </property>
@@ -7488,14 +7539,42 @@ IS OFF</string>
               <number>4</number>
              </property>
              <item>
-              <layout class="QHBoxLayout" name="layout_program_control">
-               <property name="spacing">
-                <number>8</number>
+              <widget class="JoyPad" name="pgm_control">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
-               <property name="topMargin">
-                <number>0</number>
+               <property name="highlightPosition" stdset="0">
+                <enum>JoyPad::CENTER</enum>
                </property>
-              </layout>
+               <property name="setColorState" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="left_image_path" stdset="0">
+                <pixmap>images/reload.png</pixmap>
+               </property>
+               <property name="right_image_path" stdset="0">
+                <pixmap>images/step.png</pixmap>
+               </property>
+               <property name="center_image_path" stdset="0">
+                <pixmap>images/stop.png</pixmap>
+               </property>
+               <property name="top_image_path" stdset="0">
+                <pixmap>images/run.png</pixmap>
+               </property>
+               <property name="bottom_image_path" stdset="0">
+                <pixmap>images/pause.png</pixmap>
+               </property>
+               <property name="true_color" stdset="0">
+                <color>
+                 <red>128</red>
+                 <green>128</green>
+                 <blue>128</blue>
+                </color>
+               </property>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_27">
@@ -11827,6 +11906,11 @@ OFF</string>
    <header>qtvcp.widgets.jog_increments</header>
   </customwidget>
   <customwidget>
+   <class>JoyPad</class>
+   <extends>QWidget</extends>
+   <header>qtvcp.widgets.joypad</header>
+  </customwidget>
+  <customwidget>
    <class>LED</class>
    <extends>QWidget</extends>
    <header>qtvcp.widgets.led_widget</header>
@@ -11984,7 +12068,7 @@ OFF</string>
  </slots>
  <buttongroups>
   <buttongroup name="scale_buttonGroup"/>
-  <buttongroup name="page_buttonGroup"/>
   <buttongroup name="mode_buttonGroup"/>
+  <buttongroup name="page_buttonGroup"/>
  </buttongroups>
 </ui>
